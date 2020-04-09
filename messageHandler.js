@@ -1,4 +1,4 @@
-const { inserirFicha, buscarFicha, atualizarPv } = require('./db');
+const { inserirFicha, buscarFicha, atualizarPv, adicionarItem } = require('./db');
 const rolar2d6 = require('./dado');
 
 const handleMessage = (args, jogador, canal) => {
@@ -25,6 +25,8 @@ const handleMessage = (args, jogador, canal) => {
       return cura(args, jogador, canal);
     case 'stats':
       return stats(jogador, canal);
+    case 'addItem':
+      return addItem(args, jogador, canal);
     default:
       return '';
   }
@@ -58,7 +60,8 @@ const criarFicha = async (args, jogador, canal) => {
       resistencia: caracteristicas[2],
       armadura: caracteristicas[3],
       poderDeFogo: caracteristicas[4],
-      pv: caracteristicas[2] * 5
+      pv: caracteristicas[2] * 5,
+      itens: []
     };
     await inserirFicha(ficha);
     return `A ficha do personagem ${args[1]} foi criada`;
@@ -207,6 +210,24 @@ const stats = async (jogador, canal) => {
   } catch (e) {
     return 'Você não tem personagem';
   }
+};
+
+const addItem = async (args, jogador, canal) => {
+  if (args.length === 4) {
+    const [, nomeItem, atributoBonus, atributoValor] = args;
+    try {
+      const item = {
+        nome: nomeItem,
+        atributoBonus,
+        atributoValor: Number(atributoValor)
+      };
+      await adicionarItem(jogador, canal, item);
+      return 'Item adicionando';
+    } catch (e) {
+      return 'Você não tem personagem';
+    }
+  }
+  return;
 };
 
 module.exports = handleMessage;
