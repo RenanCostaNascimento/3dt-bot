@@ -1,4 +1,4 @@
-const { inserirFicha, buscarFicha, atualizarPv, inserirItem, deletarItem } = require('./db');
+const { inserirFicha, buscarFicha, atualizarPv, inserirItem, deletarItem, atualizarAtributo } = require('./db');
 const rolar2d6 = require('./dado');
 
 const handleMessage = (args, jogador, canal) => {
@@ -29,6 +29,8 @@ const handleMessage = (args, jogador, canal) => {
       return addItem(args, jogador, canal);
     case 'removeItem':
       return removeItem(args, jogador, canal);
+    case 'set':
+      return setAtributo(args, jogador, canal);
     default:
       return '';
   }
@@ -39,8 +41,13 @@ const ajuda = () => `
   Módulo de RPG:
       * criar uma ficha:
         ficha nomePersonagem força,habilidade,resistência,armadura,poderdefogo
+        ***ficha ivanOGrande 5,5,5,5,5***
       * mostrar sua ficha:
         stats
+      * atualizar atributo:
+        set atributo novoValor
+        ***set f 3***
+        Possíveis valores para atributo: f/h/a/r/p
       * atacar:
           * usando força:
               faf
@@ -49,8 +56,9 @@ const ajuda = () => `
       * defender:
         fd
       * testes:
-          test caracteristica modificador
-          ***t h 3*** => teste de habilidade +3
+          test atributo modificador
+          ***test h 3*** => teste de habilidade +3
+          Possíveis valores para atributo: f/h/a/r/p
       * adicionar item/vantagem (serão tratados da mesma forma):
         addItem nome atributo valor
         ***addItem Arco fap 1***
@@ -297,6 +305,22 @@ const removeItem = async (args, jogador, canal) => {
     try {
       await deletarItem(jogador, canal, args[1]);
       return 'Item removido';
+    } catch (e) {
+      return 'Você não tem personagem';
+    }
+  }
+  return;
+};
+
+const setAtributo = async (args, jogador, canal) => {
+  if (args.length === 3) {
+    const atributo = dicionarioAtributo[args[1]];
+    if (!atributo) {
+      return 'Atributo inválido';
+    }
+    try {
+      const { value } = await atualizarAtributo(jogador, canal, atributo.nome, Number(args[2]));
+      return `${atributo.descricao} modificado: ***${value[atributo.nome]} => ${args[2]}***`;
     } catch (e) {
       return 'Você não tem personagem';
     }
