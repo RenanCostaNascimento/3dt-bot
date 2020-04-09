@@ -79,14 +79,21 @@ const rolagemMonstro = async (args) => {
   return `Rolagem do Monstro - ${resultadoDado}`;
 };
 
-const forcaAtaquePerto = async (args, jogador, canal) => {
+const forcaAtaquePerto = async (jogador, canal) => {
   try {
-    const { forca, habilidade } = await buscarFicha(jogador, canal);
+    const { forca, habilidade, itens } = await buscarFicha(jogador, canal);
+    const bonusFa = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'faf')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusForca = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'forca')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
+    const forcaTotal = forca + bonusForca;
+    const total = primeiraRolagem + segundaRolagem + habilidade + (forcaTotal * multiplicadorCritico) + bonusFa;
 
-    const total = primeiraRolagem + segundaRolagem + habilidade + (forca * multiplicadorCritico);
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, forca, 'F');
-
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, forcaTotal, 'F', bonusFa);
     return `Força de Ataque (Força) - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
@@ -197,7 +204,7 @@ const cura = async (args, jogador, canal) => {
 const stats = async (jogador, canal) => {
   try {
     const { nome, forca, habilidade, resistencia, armadura, poderDeFogo, pv } = await buscarFicha(jogador, canal);
-    
+
     return `
       Nome: ${nome}
       Força: ${forca}
