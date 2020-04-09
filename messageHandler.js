@@ -1,4 +1,4 @@
-const { inserirFicha, buscarFicha, atualizarPv, adicionarItem } = require('./db');
+const { inserirFicha, buscarFicha, atualizarPv, inserirItem, deletarItem } = require('./db');
 const rolar2d6 = require('./dado');
 
 const handleMessage = (args, jogador, canal) => {
@@ -27,6 +27,8 @@ const handleMessage = (args, jogador, canal) => {
       return stats(jogador, canal);
     case 'addItem':
       return addItem(args, jogador, canal);
+    case 'removeItem':
+      return removeItem(args, jogador, canal);
     default:
       return '';
   }
@@ -244,8 +246,20 @@ const addItem = async (args, jogador, canal) => {
         atributoBonus,
         atributoValor: Number(atributoValor)
       };
-      await adicionarItem(jogador, canal, item);
+      await inserirItem(jogador, canal, item);
       return 'Item adicionado';
+    } catch (e) {
+      return 'Você não tem personagem';
+    }
+  }
+  return;
+};
+
+const removeItem = async (args, jogador, canal) => {
+  if (args.length === 2) {
+    try {
+      await deletarItem(jogador, canal, args[1]);
+      return 'Item removido';
     } catch (e) {
       return 'Você não tem personagem';
     }
