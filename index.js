@@ -27,7 +27,7 @@ bot.on('message', async (msg) => {
   if (rpgLigado) {
     const response = await handleMessage(args, user, channelID);
     if (response) {
-      msg.reply(response);
+      msg.reply(response, { split: true });
     }
   }
 });
