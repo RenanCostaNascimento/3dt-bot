@@ -93,15 +93,18 @@ const criarFicha = async (args, jogador, canal) => {
   }
 };
 
-const rolagemMonstro = async (args) => {
-  const atributo = Number(args[1]);
-  const habilidade = Number(args[2]);
-  const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
+const dungeonMaster = async (args) => {
+  if (args.length >= 3) {
+    const atributo = Number(args[1]);
+    const habilidade = Number(args[2]);
+    const modificador = Number(args[3] || 0);
+    const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
 
-  const total = primeiraRolagem + segundaRolagem + habilidade + (atributo * multiplicadorCritico);
-  const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, atributo, 'Atr');
+    const total = primeiraRolagem + segundaRolagem + habilidade + (atributo * multiplicadorCritico) + modificador;
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, atributo, 'Atr', modificador);
 
-  return `Rolagem do Monstro - ${resultadoDado}`;
+    return `Rolagem do Monstro - ${resultadoDado}`;
+  }
 };
 
 const forcaAtaquePerto = async (args, jogador, canal) => {
