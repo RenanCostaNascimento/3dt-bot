@@ -159,12 +159,19 @@ const forcaDefesa = async (jogador, canal) => {
 
 const iniciativa = async (jogador, canal) => {
   try {
-    const { habilidade } = await buscarFicha(jogador, canal);
+    const { habilidade, itens } = await buscarFicha(jogador, canal);
+    const bonusIni = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'ini')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusHabilidade = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'h')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
     const { primeiraRolagem, segundaRolagem } = rolar2d6();
+    const habilidadeTotal = habilidade + bonusHabilidade;
+    const total = primeiraRolagem + segundaRolagem + habilidadeTotal + bonusIni;
 
-    const total = primeiraRolagem + segundaRolagem + habilidade;
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, 0, habilidade);
-
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, 0, habilidadeTotal, -1, undefined, bonusIni);
     return `Iniciativa - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
