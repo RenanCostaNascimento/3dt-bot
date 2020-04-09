@@ -20,7 +20,7 @@ const inserirFicha = (ficha) => {
   return new Promise((resolve, reject) => {
     const db = client.db(dbName);
     db.collection('fichas').replaceOne(
-      { jogador: ficha.jogador, canal: ficha.canal, nome: ficha.nome },
+      { jogador: ficha.jogador, canal: ficha.canal },
       ficha,
       { upsert: true },
       (err, result) => {
@@ -82,12 +82,26 @@ const deletarItem = (jogador, canal, nomeItem) => {
   });
 };
 
+const atualizarAtributo = (jogador, canal, atributo, valor) => {
+  return new Promise((resolve, reject) => {
+    const db = client.db(dbName);
+    db.collection('fichas').findOneAndUpdate(
+      { jogador, canal },
+      { $set: { [atributo]: valor } },
+      (err, result) => {
+        if (err) { console.log('erro ao inserir', err); return reject(err); }
+        resolve(result);
+      });
+  });
+};
+
 const mongoHelper = {
   inserirFicha,
   buscarFicha,
   atualizarPv,
   inserirItem,
-  deletarItem
+  deletarItem,
+  atualizarAtributo
 };
 
 Object.freeze(mongoHelper);
