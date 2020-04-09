@@ -21,6 +21,8 @@ const handleMessage = (args, jogador, canal) => {
       return dano(args, jogador, canal);
     case 'cura':
       return cura(args, jogador, canal);
+    case 'stats':
+      return stats(jogador, canal);
     default:
       return '';
   }
@@ -171,6 +173,24 @@ const cura = async (args, jogador, canal) => {
     const cura = args[1] || 0;
     const { value: { pv } } = await atualizarPv(jogador, canal, Number(cura));
     return `Curou ***${cura}***, novo PV é ***${pv}***`;
+  } catch (e) {
+    return 'Você não tem personagem';
+  }
+};
+
+const stats = async (jogador, canal) => {
+  try {
+    const { nome, forca, habilidade, resistencia, armadura, poderDeFogo, pv } = await buscarFicha(jogador, canal);
+    
+    return `
+      Nome: ${nome}
+      Força: ${forca}
+      Habilidade: ${habilidade}
+      Resistencia: ${resistencia}
+      Armadura: ${armadura}
+      Poder de Fogo: ${poderDeFogo}
+      PV: ${pv}
+    `;
   } catch (e) {
     return 'Você não tem personagem';
   }
