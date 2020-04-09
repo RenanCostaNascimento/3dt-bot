@@ -38,8 +38,8 @@ const handleMessage = (args, jogador, canal) => {
 
 const ajuda = () => `
   __Criar uma ficha__
-  \t\t*ficha nomePersonagem força,habilidade,resistência,armadura,poderdefogo*
-  \t\tExemplo: ***ficha ivanOGrande 5,5,5,5,5***
+  \t\t*ficha força,habilidade,resistência,armadura,poderdefogo*
+  \t\tExemplo: ***ficha 5,5,5,5,5***
   \t\tCada jogador só pode ter uma ficha por canal
   \t\tSe você já tiver uma ficha e criar outra, a primeira ficha será substituída pela segunda
   __Mostrar sua ficha__
@@ -95,11 +95,10 @@ const ajuda = () => `
 `;
 
 const criarFicha = async (args, jogador, canal) => {
-  if (args.length === 3) {
-    const caracteristicas = args[2].split(',').map(parseFloat);
+  if (args.length === 2) {
+    const caracteristicas = args[1].split(',').map(parseFloat);
     const ficha = {
       jogador, canal,
-      nome: args[1],
       forca: caracteristicas[0],
       habilidade: caracteristicas[1],
       resistencia: caracteristicas[2],
@@ -110,7 +109,7 @@ const criarFicha = async (args, jogador, canal) => {
       itens: []
     };
     await inserirFicha(ficha);
-    return `A ficha do personagem ${args[1]} foi criada`;
+    return 'Sua ficha foi criada';
   }
 };
 
@@ -302,11 +301,10 @@ const pontosDeMagia = async (args, jogador, canal) => {
 
 const stats = async (jogador, canal) => {
   try {
-    const { nome, forca, habilidade, resistencia, armadura, poderDeFogo, pv, itens } = await buscarFicha(jogador, canal);
+    const { forca, habilidade, resistencia, armadura, poderDeFogo, pv, itens } = await buscarFicha(jogador, canal);
     const listagemItens = itens.map(({ nome, atributoBonus, atributoValor }) => `\n\t\t- ${nome} (${atributoBonus}): ${atributoValor}`);
 
     return `
-    Nome: ${nome}
     Força: ${forca}
     Habilidade: ${habilidade}
     Resistencia: ${resistencia}
