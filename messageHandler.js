@@ -39,6 +39,8 @@ const ajuda = () => `
   Módulo de RPG:
       * criar uma ficha:
         f nomePersonagem força,habilidade,resistência,armadura,poderdefogo
+      * mostrar sua ficha:
+        stats
       * atacar:
           * usando força:
               faf
@@ -48,7 +50,18 @@ const ajuda = () => `
         fd
       * testes:
           t caracteristica modificador
-          exemplo t h 3 => teste de habilidade +3
+          ***t h 3*** => teste de habilidade +3
+      * adicionar item/vantagem (serão tratados da mesma forma):
+        addItem nome atributo valor
+        ***addItem Arco fap 1***
+        Possíveis valores para atributo:
+          - faf: bônus em força de ataque para força
+          - fap: bônus em força de ataque para pdf
+          - fd: bônus em força de defesa
+          - forca/armadura/pdf: bônus no atributo
+      * remover item/vantagem
+        removeItem nome
+        Se você tiver vários itens com o mesmo nome, todos serão removidos
 `;
 
 const criarFicha = async (args, jogador, canal) => {
