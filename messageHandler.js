@@ -5,7 +5,7 @@ const handleMessage = (args, jogador, canal) => {
   switch (args[0]) {
     case 'ajuda':
       return ajuda();
-    case 'f':
+    case 'ficha':
       return criarFicha(args, jogador, canal);
     case 'faf':
       return forcaAtaquePerto(jogador, canal);
@@ -17,7 +17,7 @@ const handleMessage = (args, jogador, canal) => {
       return rolagemMonstro(args, jogador, canal);
     case 'ini':
       return iniciativa(jogador, canal);
-    case 't':
+    case 'test':
       return teste(args, jogador, canal);
     case 'dano':
       return dano(args, jogador, canal);
@@ -38,7 +38,7 @@ const ajuda = () => `
   Versão de 08/04/2020 do 3D&Bot
   Módulo de RPG:
       * criar uma ficha:
-        f nomePersonagem força,habilidade,resistência,armadura,poderdefogo
+        ficha nomePersonagem força,habilidade,resistência,armadura,poderdefogo
       * mostrar sua ficha:
         stats
       * atacar:
@@ -49,7 +49,7 @@ const ajuda = () => `
       * defender:
         fd
       * testes:
-          t caracteristica modificador
+          test caracteristica modificador
           ***t h 3*** => teste de habilidade +3
       * adicionar item/vantagem (serão tratados da mesma forma):
         addItem nome atributo valor
@@ -58,7 +58,8 @@ const ajuda = () => `
           - faf: bônus em força de ataque para força
           - fap: bônus em força de ataque para pdf
           - fd: bônus em força de defesa
-          - forca/armadura/pdf: bônus no atributo
+          - ini: bônus de iniciativa
+          - f/h/a/r/p: bônus no atributo (conta para ataque, defesa e testes)
       * remover item/vantagem
         removeItem nome
         Se você tiver vários itens com o mesmo nome, todos serão removidos
@@ -207,11 +208,15 @@ const teste = async (args, jogador, canal) => {
   try {
     const modificador = Number(args[2] || 0);
     const ficha = await buscarFicha(jogador, canal);
+    const bonusAtributo = ficha.itens
+      .filter(({ atributoBonus }) => atributoBonus === args[1])
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
+    const totalAtributo = ficha[atributo.nome] + bonusAtributo;
+    const total = primeiraRolagem + segundaRolagem + (totalAtributo * multiplicadorCritico) + modificador;
 
-    const total = primeiraRolagem + segundaRolagem + (ficha[atributo.nome] * multiplicadorCritico) + modificador;
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, -1, ficha[atributo.nome], atributo.descricao[0], modificador);
-
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, -1, totalAtributo, atributo.descricao[0], modificador);
     return `Teste de ${atributo.descricao} - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
