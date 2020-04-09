@@ -19,6 +19,8 @@ const handleMessage = (args, jogador, canal) => {
       return teste(args, jogador, canal);
     case 'dano':
       return dano(args, jogador, canal);
+    case 'cura':
+      return cura(args, jogador, canal);
     default:
       return '';
   }
@@ -161,7 +163,15 @@ const dano = async (args, jogador, canal) => {
   } catch (e) {
     return 'Você não tem personagem';
   }
+};
 
+const cura = async (args, jogador, canal) => {
+  try {
+    const { value: { pv } } = await atualizarPv(jogador, canal, Number(args[1]));
+    return `Curou ***${args[1]}***, novo PV é ***${pv}***`;
+  } catch (e) {
+    return 'Você não tem personagem';
+  }
 };
 
 module.exports = handleMessage;
