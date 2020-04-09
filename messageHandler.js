@@ -158,8 +158,9 @@ const construirResultadoDado = (primeiraRolagem, segundaRolagem, total, multipli
 
 const dano = async (args, jogador, canal) => {
   try {
-    const { value: { pv } } = await atualizarPv(jogador, canal, -Number(args[1]));
-    return `Tomou ***${args[1]}*** de dano, novo PV é ***${pv}***`;
+    const dano = args[1] || 0;
+    const { value: { pv } } = await atualizarPv(jogador, canal, -Number(dano));
+    return `Tomou ***${dano}*** de dano, novo PV é ***${pv}***`;
   } catch (e) {
     return 'Você não tem personagem';
   }
@@ -167,8 +168,9 @@ const dano = async (args, jogador, canal) => {
 
 const cura = async (args, jogador, canal) => {
   try {
-    const { value: { pv } } = await atualizarPv(jogador, canal, Number(args[1]));
-    return `Curou ***${args[1]}***, novo PV é ***${pv}***`;
+    const cura = args[1] || 0;
+    const { value: { pv } } = await atualizarPv(jogador, canal, Number(cura));
+    return `Curou ***${cura}***, novo PV é ***${pv}***`;
   } catch (e) {
     return 'Você não tem personagem';
   }
