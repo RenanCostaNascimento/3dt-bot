@@ -113,7 +113,10 @@ const criarFicha = async (args, jogador, canal) => {
       poderDeFogo: caracteristicas[4],
       pv: caracteristicas[2] * 5,
       pm: caracteristicas[2] * 5,
-      itens: [],
+      itens: [
+        { nome: 'Ataque Especial Básico - Força', atributoBonus: 'aef', atributoValor: 1 },
+        { nome: 'Ataque Especial Básico - PdF', atributoBonus: 'aep', atributoValor: 1 }
+      ],
       po: 0
     };
     await inserirFicha(ficha);
@@ -137,7 +140,13 @@ const dungeonMaster = async (args) => {
 
 const forcaAtaquePerto = async (args, jogador, canal) => {
   try {
-    const { forca, habilidade, itens } = await buscarFicha(jogador, canal);
+    const { forca, habilidade, itens, pm } = await buscarFicha(jogador, canal);
+
+    const ehAtaqueEspecial = args[1] === 'ae';
+    if (ehAtaqueEspecial && pm === 0) {
+      return 'Você não tem PM suficiente para esse ataque';
+    }
+
     const bonusFa = itens
       .filter(({ atributoBonus }) => atributoBonus === 'faf')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
@@ -147,9 +156,15 @@ const forcaAtaquePerto = async (args, jogador, canal) => {
     const bonusHabilidade = itens
       .filter(({ atributoBonus }) => atributoBonus === 'h')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusAtaqueEspecial = args[1] === 'ae' && itens
+    const bonusAtaqueEspecial = ehAtaqueEspecial && itens
       .filter(({ atributoBonus }) => atributoBonus === 'aef')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
+    let pmsRestantes = '';
+    if (ehAtaqueEspecial) {
+      const { value } = await incrementarAtributo(jogador, canal, -1, 'pm');
+      pmsRestantes = `\nPMs restantes: ${value.pm}`;
+    }
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
     const forcaTotal = forca + bonusForca + bonusAtaqueEspecial;
@@ -157,7 +172,7 @@ const forcaAtaquePerto = async (args, jogador, canal) => {
     const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (forcaTotal * multiplicadorCritico) + bonusFa;
 
     const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidadeTotal, forcaTotal, 'F', bonusFa);
-    return `Força de Ataque (Força) - ${resultadoDado}`;
+    return `Força de Ataque (Força) - ${resultadoDado}${pmsRestantes}`;
   } catch (e) {
     return 'Você não tem personagem';
   }
@@ -165,7 +180,13 @@ const forcaAtaquePerto = async (args, jogador, canal) => {
 
 const forcaAtaqueLonge = async (args, jogador, canal) => {
   try {
-    const { poderDeFogo, habilidade, itens } = await buscarFicha(jogador, canal);
+    const { poderDeFogo, habilidade, itens, pm } = await buscarFicha(jogador, canal);
+
+    const ehAtaqueEspecial = args[1] === 'ae';
+    if (ehAtaqueEspecial && pm === 0) {
+      return 'Você não tem PM suficiente para esse ataque';
+    }
+
     const bonusFa = itens
       .filter(({ atributoBonus }) => atributoBonus === 'fap')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
@@ -175,9 +196,15 @@ const forcaAtaqueLonge = async (args, jogador, canal) => {
     const bonusHabilidade = itens
       .filter(({ atributoBonus }) => atributoBonus === 'h')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusAtaqueEspecial = args[1] === 'ae' && itens
+    const bonusAtaqueEspecial = ehAtaqueEspecial && itens
       .filter(({ atributoBonus }) => atributoBonus === 'aep')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
+    let pmsRestantes = '';
+    if (ehAtaqueEspecial) {
+      const { value } = await incrementarAtributo(jogador, canal, -1, 'pm');
+      pmsRestantes = `\nPMs restantes: ${value.pm}`;
+    }
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
     const totalPdF = poderDeFogo + bonusPdF + bonusAtaqueEspecial;
@@ -185,7 +212,7 @@ const forcaAtaqueLonge = async (args, jogador, canal) => {
     const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (totalPdF * multiplicadorCritico) + bonusFa;
 
     const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidadeTotal, totalPdF, 'PdF', bonusFa);
-    return `Força de Ataque (Poder de Fogo) - ${resultadoDado}`;
+    return `Força de Ataque (Poder de Fogo) - ${resultadoDado}${pmsRestantes}`;
   } catch (e) {
     return 'Você não tem personagem';
   }
@@ -242,7 +269,7 @@ const ataqueMagico = async (args, jogador, canal) => {
       const { primeiraRolagem, segundaRolagem } = rolar2d6();
       const total = primeiraRolagem + segundaRolagem + habilidadeTotal + pmsGastos;
       const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, 0, habilidadeTotal, 0, undefined, pmsGastos);
-      
+
       return `Ataque Mágico - ${resultadoDado}\nPMs restantes: ${pmsRestantes}`;
     } catch (e) {
       return 'Você não tem personagem';
