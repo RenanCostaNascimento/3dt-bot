@@ -1,4 +1,12 @@
-const { inserirFicha, buscarFicha, incrementarAtributo, inserirItem, deletarItem, atualizarAtributo } = require('./db');
+const {
+  inserirFicha,
+  removerFicha,
+  buscarFicha,
+  incrementarAtributo,
+  inserirItem,
+  deletarItem,
+  atualizarAtributo
+} = require('./db');
 const rolar2d6 = require('./dado');
 
 const handleMessage = (args, jogador, canal) => {
@@ -58,6 +66,8 @@ const ajuda = () => `
   \t\t- Usando Poder de Fogo:
   \t\t\t\t*fap ae*
   \t\t*ae* é um parâmetro opcional indicando que é um ataque especial, só é usado se você tiver esse item
+  \t\t- Usando Ataque Mágico:
+  \t\t\t\t*am quantidadePms*
   __Defender__
   \t\t*fd sh*
   \t\t*sh* é um parâmetro opcional para defender sem habilidade
@@ -187,7 +197,7 @@ const forcaAtaqueLonge = async (args, jogador, canal) => {
     const bonusPdF = somarAtributosItens(itens, 'p');
     const bonusHabilidade = somarAtributosItens(itens, 'h');
     const bonusAtaqueEspecial = ehAtaqueEspecial && somarAtributosItens(itens, 'aep');
-    
+
     let pmsRestantes = '';
     if (ehAtaqueEspecial) {
       const { value } = await incrementarAtributo(jogador, canal, -1, 'pm');
@@ -262,7 +272,7 @@ const ataqueMagico = async (args, jogador, canal) => {
 const iniciativa = async (jogador, canal) => {
   try {
     const { habilidade, itens } = await buscarFicha(jogador, canal);
-    
+
     const bonusIniciativa = somarAtributosItens(itens, 'ini');
     const bonusHabilidade = somarAtributosItens(itens, 'h');
 
@@ -324,6 +334,10 @@ const pontosDeVida = async (args, jogador, canal) => {
     const incremento = args[1] || 0;
     if (incremento !== 0) {
       const { value: { pv } } = await incrementarAtributo(jogador, canal, Number(incremento), 'pv');
+      if (pv <= -10) {
+        await removerFicha(jogador, canal);
+        return 'GAME OVER';
+      }
       const danoOuCura = incremento < 0 ? `Tomou ***${incremento}*** de dano` : `Curou ${incremento} de vida`;
       return `${danoOuCura}, novo PV é ***${pv}***`;
     }
