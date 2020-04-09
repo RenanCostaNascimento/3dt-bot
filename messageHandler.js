@@ -12,7 +12,7 @@ const handleMessage = (args, jogador, canal) => {
     case 'fap':
       return forcaAtaqueLonge(jogador, canal);
     case 'fd':
-      return forcaDefesa(jogador, canal);
+      return forcaDefesa(args, jogador, canal);
     case 'rm':
       return rolagemMonstro(args, jogador, canal);
     case 'ini':
@@ -54,7 +54,8 @@ const ajuda = () => `
           * usando Poder de Fogo:
               fap
       * defender:
-        fd
+        fd sh*
+        sh é um parâmetro opcional para defender sem habilidade
       * testes:
           test atributo modificador
           ***test h 3*** => teste de habilidade +3
@@ -153,7 +154,7 @@ const forcaAtaqueLonge = async (jogador, canal) => {
   }
 };
 
-const forcaDefesa = async (jogador, canal) => {
+const forcaDefesa = async (args, jogador, canal) => {
   try {
     const { armadura, habilidade, itens } = await buscarFicha(jogador, canal);
     const bonusFd = itens
@@ -165,10 +166,11 @@ const forcaDefesa = async (jogador, canal) => {
     const bonusHabilidade = itens
       .filter(({ atributoBonus }) => atributoBonus === 'h')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const multiplicadorHabilidade = args[1] === 'sh' ? 0 : 1;
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
     const totalArmadura = armadura + bonusArmadura;
-    const habilidadeTotal = habilidade + bonusHabilidade;
+    const habilidadeTotal = (habilidade + bonusHabilidade) * multiplicadorHabilidade;
     const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (totalArmadura * multiplicadorCritico) + bonusFd;
 
     const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidadeTotal, totalArmadura, 'A', bonusFd);
