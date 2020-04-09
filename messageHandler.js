@@ -19,10 +19,10 @@ const handleMessage = (args, jogador, canal) => {
       return iniciativa(jogador, canal);
     case 'test':
       return teste(args, jogador, canal);
-    case 'dano':
-      return dano(args, jogador, canal);
-    case 'cura':
-      return cura(args, jogador, canal);
+    case 'pv':
+      return pontosDeVida(args, jogador, canal);
+    case 'pm':
+      return pontosDeMagia(args, jogador, canal);
     case 'stats':
       return stats(jogador, canal);
     case 'add':
@@ -57,6 +57,14 @@ const ajuda = () => `
   __Defender__
   \t\t*fd sh*
   \t\t*sh* é um parâmetro opcional para defender sem habilidade
+  __Iniciativa__
+  \t\t*ini*
+  __Curar ou tomar dano__
+  \t\t*pv valor*
+  \t\t*valor* pode ser positivo (cura) ou negativo (dano)
+  __Recuperar ou gastar mana__
+  \t\t*pm valor*
+  \t\t*valor* pode ser positivo (recuperar) ou negativo (gastar)
   __Testar atributo__
   \t\t*test atributo modificador*
   \t\t*modificador* é um parâmetro opcional que será somado ao resultado
@@ -98,6 +106,7 @@ const criarFicha = async (args, jogador, canal) => {
       armadura: caracteristicas[3],
       poderDeFogo: caracteristicas[4],
       pv: caracteristicas[2] * 5,
+      pm: caracteristicas[2] * 5,
       itens: []
     };
     await inserirFicha(ficha);
@@ -265,21 +274,27 @@ const construirResultadoDado = (primeiraRolagem, segundaRolagem, total, multipli
   return `${resultadoDado}${somarAtributo}${somarHabilidade}${somarModificador} = ${exibirTotal}${exibirCritico}`;
 };
 
-const dano = async (args, jogador, canal) => {
+const pontosDeVida = async (args, jogador, canal) => {
   try {
-    const dano = args[1] || 0;
-    const { value: { pv } } = await atualizarPv(jogador, canal, -Number(dano));
-    return `Tomou ***${dano}*** de dano, novo PV é ***${pv}***`;
+    const incremento = args[1] || 0;
+    if (incremento !== 0) {
+      const { value: { pv } } = await atualizarPv(jogador, canal, Number(incremento), 'pv');
+      const danoOuCura = incremento < 0 ? `Tomou ***${incremento}*** de dano` : `Curou ${incremento} de vida`;
+      return `${danoOuCura}, novo PV é ***${pv}***`;
+    }
   } catch (e) {
     return 'Você não tem personagem';
   }
 };
 
-const cura = async (args, jogador, canal) => {
+const pontosDeMagia = async (args, jogador, canal) => {
   try {
-    const cura = args[1] || 0;
-    const { value: { pv } } = await atualizarPv(jogador, canal, Number(cura));
-    return `Curou ***${cura}***, novo PV é ***${pv}***`;
+    const incremento = args[1] || 0;
+    if (incremento !== 0) {
+      const { value: { pm } } = await atualizarPv(jogador, canal, Number(incremento), 'pm');
+      const usarOuRecuperar = incremento < 0 ? `Usou ***${incremento}*** de PM` : `Recuperou ${incremento} de PM`;
+      return `${usarOuRecuperar}, novo PM é ***${pm}***`;
+    }
   } catch (e) {
     return 'Você não tem personagem';
   }

@@ -42,12 +42,12 @@ const buscarFicha = (jogador, canal) => {
   });
 };
 
-const atualizarPv = (jogador, canal, incremento) => {
+const atualizarPv = (jogador, canal, incremento, atributo) => {
   return new Promise((resolve, reject) => {
     const db = client.db(dbName);
     db.collection('fichas').findOneAndUpdate(
       { jogador: jogador, canal: canal },
-      { $inc: { pv: incremento } },
+      { $inc: { [atributo]: incremento } },
       { returnOriginal: false },
       (err, result) => {
         if (err) { console.log('erro ao atualizar pv', err); return reject(err); }
