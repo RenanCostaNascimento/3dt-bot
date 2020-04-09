@@ -138,6 +138,10 @@ const dungeonMaster = async (args) => {
   }
 };
 
+const somarAtributosItens = (itens, atributo) => itens
+  .filter(({ atributoBonus }) => atributoBonus === atributo)
+  .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
 const forcaAtaquePerto = async (args, jogador, canal) => {
   try {
     const { forca, habilidade, itens, pm } = await buscarFicha(jogador, canal);
@@ -147,18 +151,10 @@ const forcaAtaquePerto = async (args, jogador, canal) => {
       return 'Você não tem PM suficiente para esse ataque';
     }
 
-    const bonusFa = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'faf')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusForca = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'f')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusHabilidade = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'h')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusAtaqueEspecial = ehAtaqueEspecial && itens
-      .filter(({ atributoBonus }) => atributoBonus === 'aef')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusFa = somarAtributosItens(itens, 'faf');
+    const bonusForca = somarAtributosItens(itens, 'f');
+    const bonusHabilidade = somarAtributosItens(itens, 'h');
+    const bonusAtaqueEspecial = ehAtaqueEspecial && somarAtributosItens(itens, 'aef');
 
     let pmsRestantes = '';
     if (ehAtaqueEspecial) {
@@ -187,19 +183,11 @@ const forcaAtaqueLonge = async (args, jogador, canal) => {
       return 'Você não tem PM suficiente para esse ataque';
     }
 
-    const bonusFa = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'fap')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusPdF = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'p')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusHabilidade = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'h')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusAtaqueEspecial = ehAtaqueEspecial && itens
-      .filter(({ atributoBonus }) => atributoBonus === 'aep')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-
+    const bonusFa = somarAtributosItens(itens, 'fap');
+    const bonusPdF = somarAtributosItens(itens, 'p');
+    const bonusHabilidade = somarAtributosItens(itens, 'h');
+    const bonusAtaqueEspecial = ehAtaqueEspecial && somarAtributosItens(itens, 'aep');
+    
     let pmsRestantes = '';
     if (ehAtaqueEspecial) {
       const { value } = await incrementarAtributo(jogador, canal, -1, 'pm');
@@ -221,15 +209,10 @@ const forcaAtaqueLonge = async (args, jogador, canal) => {
 const forcaDefesa = async (args, jogador, canal) => {
   try {
     const { armadura, habilidade, itens } = await buscarFicha(jogador, canal);
-    const bonusFd = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'fd')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusArmadura = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'a')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusHabilidade = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'h')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
+    const bonusFd = somarAtributosItens(itens, 'fd');
+    const bonusArmadura = somarAtributosItens(itens, 'a');
+    const bonusHabilidade = somarAtributosItens(itens, 'h');
     const multiplicadorHabilidade = args[1] === 'sh' ? 0 : 1;
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
@@ -254,9 +237,7 @@ const ataqueMagico = async (args, jogador, canal) => {
         return `Seus PMs atuais (${pm}) são insuficientes pra conjurar essa magia`;
       }
 
-      const bonusHabilidade = itens
-        .filter(({ atributoBonus }) => atributoBonus === 'h')
-        .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+      const bonusHabilidade = somarAtributosItens(itens, 'h');
       const habilidadeTotal = habilidade + bonusHabilidade;
       const limiteMagico = habilidadeTotal === 0 ? 3 : habilidadeTotal * 5;
 
@@ -281,18 +262,15 @@ const ataqueMagico = async (args, jogador, canal) => {
 const iniciativa = async (jogador, canal) => {
   try {
     const { habilidade, itens } = await buscarFicha(jogador, canal);
-    const bonusIni = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'ini')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
-    const bonusHabilidade = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'h')
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    
+    const bonusIniciativa = somarAtributosItens(itens, 'ini');
+    const bonusHabilidade = somarAtributosItens(itens, 'h');
 
     const { primeiraRolagem, segundaRolagem } = rolar2d6();
     const habilidadeTotal = habilidade + bonusHabilidade;
-    const total = primeiraRolagem + segundaRolagem + habilidadeTotal + bonusIni;
+    const total = primeiraRolagem + segundaRolagem + habilidadeTotal + bonusIniciativa;
 
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, 0, habilidadeTotal, -1, undefined, bonusIni);
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, 0, habilidadeTotal, -1, undefined, bonusIniciativa);
     return `Iniciativa - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
@@ -316,9 +294,8 @@ const teste = async (args, jogador, canal) => {
   try {
     const modificador = Number(args[2] || 0);
     const ficha = await buscarFicha(jogador, canal);
-    const bonusAtributo = ficha.itens
-      .filter(({ atributoBonus }) => atributoBonus === args[1])
-      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
+    const bonusAtributo = somarAtributosItens(ficha.itens, args[1]);
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
     const totalAtributo = ficha[atributo.nome] + bonusAtributo;
