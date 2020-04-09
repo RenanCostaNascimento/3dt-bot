@@ -8,9 +8,9 @@ const handleMessage = (args, jogador, canal) => {
     case 'ficha':
       return criarFicha(args, jogador, canal);
     case 'faf':
-      return forcaAtaquePerto(jogador, canal);
+      return forcaAtaquePerto(args, jogador, canal);
     case 'fap':
-      return forcaAtaqueLonge(jogador, canal);
+      return forcaAtaqueLonge(args, jogador, canal);
     case 'fd':
       return forcaDefesa(args, jogador, canal);
     case 'rm':
@@ -104,7 +104,7 @@ const rolagemMonstro = async (args) => {
   return `Rolagem do Monstro - ${resultadoDado}`;
 };
 
-const forcaAtaquePerto = async (jogador, canal) => {
+const forcaAtaquePerto = async (args, jogador, canal) => {
   try {
     const { forca, habilidade, itens } = await buscarFicha(jogador, canal);
     const bonusFa = itens
@@ -116,9 +116,12 @@ const forcaAtaquePerto = async (jogador, canal) => {
     const bonusHabilidade = itens
       .filter(({ atributoBonus }) => atributoBonus === 'h')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusAtaqueEspecial = args[1] === 'ae' && itens
+      .filter(({ atributoBonus }) => atributoBonus === 'aef')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
-    const forcaTotal = forca + bonusForca;
+    const forcaTotal = forca + bonusForca + bonusAtaqueEspecial;
     const habilidadeTotal = habilidade + bonusHabilidade;
     const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (forcaTotal * multiplicadorCritico) + bonusFa;
 
@@ -129,7 +132,7 @@ const forcaAtaquePerto = async (jogador, canal) => {
   }
 };
 
-const forcaAtaqueLonge = async (jogador, canal) => {
+const forcaAtaqueLonge = async (args, jogador, canal) => {
   try {
     const { poderDeFogo, habilidade, itens } = await buscarFicha(jogador, canal);
     const bonusFa = itens
@@ -141,9 +144,12 @@ const forcaAtaqueLonge = async (jogador, canal) => {
     const bonusHabilidade = itens
       .filter(({ atributoBonus }) => atributoBonus === 'h')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusAtaqueEspecial = args[1] === 'ae' && itens
+      .filter(({ atributoBonus }) => atributoBonus === 'aep')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
-    const totalPdF = poderDeFogo + bonusPdF;
+    const totalPdF = poderDeFogo + bonusPdF + bonusAtaqueEspecial;
     const habilidadeTotal = habilidade + bonusHabilidade;
     const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (totalPdF * multiplicadorCritico) + bonusFa;
 
