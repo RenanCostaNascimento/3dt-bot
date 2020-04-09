@@ -13,8 +13,8 @@ const handleMessage = (args, jogador, canal) => {
       return forcaAtaqueLonge(args, jogador, canal);
     case 'fd':
       return forcaDefesa(args, jogador, canal);
-    case 'rm':
-      return rolagemMonstro(args, jogador, canal);
+    case 'dm':
+      return dungeonMaster(args, jogador, canal);
     case 'ini':
       return iniciativa(jogador, canal);
     case 'test':
@@ -25,9 +25,9 @@ const handleMessage = (args, jogador, canal) => {
       return cura(args, jogador, canal);
     case 'stats':
       return stats(jogador, canal);
-    case 'addItem':
+    case 'add':
       return addItem(args, jogador, canal);
-    case 'removeItem':
+    case 'rm':
       return removeItem(args, jogador, canal);
     case 'set':
       return setAtributo(args, jogador, canal);
@@ -37,41 +37,53 @@ const handleMessage = (args, jogador, canal) => {
 };
 
 const ajuda = () => `
-  Versão de 08/04/2020 do 3D&Bot
-  Módulo de RPG:
-      * criar uma ficha:
-        ficha nomePersonagem força,habilidade,resistência,armadura,poderdefogo
-        ***ficha ivanOGrande 5,5,5,5,5***
-      * mostrar sua ficha:
-        stats
-      * atualizar atributo:
-        set atributo novoValor
-        ***set f 3***
-        Possíveis valores para atributo: f/h/a/r/p
-      * atacar:
-          * usando força:
-              faf
-          * usando Poder de Fogo:
-              fap
-      * defender:
-        fd sh*
-        sh é um parâmetro opcional para defender sem habilidade
-      * testes:
-          test atributo modificador
-          ***test h 3*** => teste de habilidade +3
-          Possíveis valores para atributo: f/h/a/r/p
-      * adicionar item/vantagem (serão tratados da mesma forma):
-        addItem nome atributo valor
-        ***addItem Arco fap 1***
-        Possíveis valores para atributo:
-          - faf: bônus em força de ataque para força
-          - fap: bônus em força de ataque para pdf
-          - fd: bônus em força de defesa
-          - ini: bônus de iniciativa
-          - f/h/a/r/p: bônus no atributo (conta para ataque, defesa e testes)
-      * remover item/vantagem
-        removeItem nome
-        Se você tiver vários itens com o mesmo nome, todos serão removidos
+  __Criar uma ficha__
+  \t\t*ficha nomePersonagem força,habilidade,resistência,armadura,poderdefogo*
+  \t\tExemplo: ***ficha ivanOGrande 5,5,5,5,5***
+  \t\tCada jogador só pode ter uma ficha por canal
+  \t\tSe você já tiver uma ficha e criar outra, a primeira ficha será substituída pela segunda
+  __Mostrar sua ficha__
+  \t\t*stats*
+  __Atualizar atributo__
+  \t\t*set atributo novoValor*
+  \t\tExemplo: ***set f 3***
+  \t\tPossíveis valores para atributo: f/h/a/r/p
+  __Atacar__
+  \t\t- Usando força:
+  \t\t\t\t*faf ae*
+  \t\t- Usando Poder de Fogo:
+  \t\t\t\t*fap ae*
+  \t\t*ae* é um parâmetro opcional indicando que é um ataque especial, só é usado se você tiver esse item
+  __Defender__
+  \t\t*fd sh*
+  \t\t*sh* é um parâmetro opcional para defender sem habilidade
+  __Testar atributo__
+  \t\t*test atributo modificador*
+  \t\t*modificador* é um parâmetro opcional que será somado ao resultado
+  \t\tExemplo: ***test h 3*** => teste de habilidade +3
+  \t\tPossíveis valores para atributo: f/h/a/r/p
+  __Adicionar item/vantagem__ (serão tratados da mesma forma)
+  \t\t*add nome atributo valor*
+  \t\tExemplo: ***add Arco fap 1***
+  \t\tPossíveis valores para atributo:
+  \t\t\t\t- faf: bônus em força de ataque para força
+  \t\t\t\t- fap: bônus em força de ataque para pdf
+  \t\t\t\t- fd: bônus em força de defesa
+  \t\t\t\t- ini: bônus de iniciativa
+  \t\t\t\t- f/h/a/r/p: bônus no atributo (conta para ataque, defesa e testes)
+  \t\t\t\t- aef: ataque especial de força (nesse caso o *valor* indica o aumento de força, não o nível da vantagem)
+  \t\t\t\t- aep: ataque especial de pdf (idem)
+  __Remover item/vantagem__
+  \t\t*rm nome*
+  \t\tSe você tiver vários itens com o mesmo nome, todos serão removidos
+  __Rolagem do mestre (DM)__
+  \t\t*dm atributoCritavel atributoNaoCritavel modificador*
+  \t\t*atributoCritavel* indica qual valor será dobrado/triplicado em caso de crítico, normalmente F, A, ou PdF
+  \t\t*modificador* é um parâmetro opcional que será somado ao resultado
+  \t\tExemplo: ***dm 2 3*** => 2d6 + Atr(2) + H(3) - usado para ataque e defesa
+  \t\tExemplo: ***dm 0 3*** => 2d6 + H(3) - iniciativa, defender sem A
+  \t\tExemplo: ***dm 3 0*** => 2d6 + Atr(3) - teste de atributo, defender sem H
+  \t\tExemplo: ***dm 2 1 3*** => 2d6 + Atr(2) + H(1) + Mod(3)
 `;
 
 const criarFicha = async (args, jogador, canal) => {
@@ -303,7 +315,7 @@ const addItem = async (args, jogador, canal) => {
         atributoValor: Number(atributoValor)
       };
       await inserirItem(jogador, canal, item);
-      return 'Item adicionado';
+      return `${nomeItem} adicionado`;
     } catch (e) {
       return 'Você não tem personagem';
     }
@@ -315,7 +327,7 @@ const removeItem = async (args, jogador, canal) => {
   if (args.length === 2) {
     try {
       await deletarItem(jogador, canal, args[1]);
-      return 'Item removido';
+      return `${args[1]} removido`;
     } catch (e) {
       return 'Você não tem personagem';
     }
