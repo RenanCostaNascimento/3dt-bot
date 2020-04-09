@@ -30,6 +30,18 @@ const inserirFicha = (ficha) => {
   });
 };
 
+const removerFicha = (jogador, canal) => {
+  return new Promise((resolve, reject) => {
+    const db = client.db(dbName);
+    db.collection('fichas').deleteOne(
+      { jogador, canal },
+      (err, result) => {
+        if (err) { console.log('erro ao remover', err); return reject(err); }
+        resolve(result);
+      });
+  });
+};
+
 const buscarFicha = (jogador, canal) => {
   return new Promise((resolve, reject) => {
     const db = client.db(dbName);
@@ -97,6 +109,7 @@ const atualizarAtributo = (jogador, canal, atributo, valor) => {
 
 const mongoHelper = {
   inserirFicha,
+  removerFicha,
   buscarFicha,
   incrementarAtributo,
   inserirItem,
