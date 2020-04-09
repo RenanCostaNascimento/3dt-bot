@@ -15,7 +15,7 @@ const handleMessage = (args, jogador, canal) => {
       return forcaDefesa(jogador, canal);
     case 'rm':
       return rolagemMonstro(args, jogador, canal);
-    case 'i':
+    case 'ini':
       return iniciativa(jogador, canal);
     case 't':
       return teste(args, jogador, canal);
@@ -210,16 +210,18 @@ const cura = async (args, jogador, canal) => {
 
 const stats = async (jogador, canal) => {
   try {
-    const { nome, forca, habilidade, resistencia, armadura, poderDeFogo, pv } = await buscarFicha(jogador, canal);
+    const { nome, forca, habilidade, resistencia, armadura, poderDeFogo, pv, itens } = await buscarFicha(jogador, canal);
+    const listagemItens = itens.map(({ nome, atributoBonus, atributoValor }) => `\n\t\t- ${nome} (${atributoBonus}): ${atributoValor}`);
 
     return `
-      Nome: ${nome}
-      Força: ${forca}
-      Habilidade: ${habilidade}
-      Resistencia: ${resistencia}
-      Armadura: ${armadura}
-      Poder de Fogo: ${poderDeFogo}
-      PV: ${pv}
+    Nome: ${nome}
+    Força: ${forca}
+    Habilidade: ${habilidade}
+    Resistencia: ${resistencia}
+    Armadura: ${armadura}
+    Poder de Fogo: ${poderDeFogo}
+    PV: ${pv}
+    Itens: ${listagemItens.toString()}
     `;
   } catch (e) {
     return 'Você não tem personagem';
