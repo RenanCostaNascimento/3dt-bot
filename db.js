@@ -56,10 +56,25 @@ const atualizarPv = (jogador, canal, incremento) => {
   });
 };
 
+const adicionarItem = (jogador, canal, item) => {
+  return new Promise((resolve, reject) => {
+    const db = client.db(dbName);
+    db.collection('fichas').updateOne(
+      { jogador: jogador, canal: canal },
+      { $push: { itens: item } },
+      (err, result) => {
+        if (err) { console.log('erro ao atualizar pv', err); return reject(err); }
+        resolve(result);
+      });
+  });
+};
+
+
 const mongoHelper = {
   inserirFicha,
   buscarFicha,
-  atualizarPv
+  atualizarPv,
+  adicionarItem
 };
 
 Object.freeze(mongoHelper);
