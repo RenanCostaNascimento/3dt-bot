@@ -13,6 +13,8 @@ const handleMessage = (args, jogador, canal) => {
       return forcaAtaqueLonge(jogador, canal);
     case 'fd':
       return forcaDefesa(jogador, canal);
+    case 'rm':
+      return rolagemMonstro(args, jogador, canal);
     case 'i':
       return iniciativa(jogador, canal);
     case 't':
@@ -63,7 +65,18 @@ const criarFicha = async (args, jogador, canal) => {
   }
 };
 
-const forcaAtaquePerto = async (jogador, canal) => {
+const rolagemMonstro = async (args) => {
+  const atributo = Number(args[1]);
+  const habilidade = Number(args[2]);
+  const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
+
+  const total = primeiraRolagem + segundaRolagem + habilidade + (atributo * multiplicadorCritico);
+  const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, atributo, 'Atr');
+
+  return `Rolagem do Monstro - ${resultadoDado}`;
+};
+
+const forcaAtaquePerto = async (args, jogador, canal) => {
   try {
     const { forca, habilidade } = await buscarFicha(jogador, canal);
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
@@ -155,7 +168,7 @@ const construirResultadoDado = (primeiraRolagem, segundaRolagem, total, multipli
   const exibirTotal = `***${total === 13 ? 'É 13, porra!' : total}***`;
   const exibirCritico = multiplicadorCritico > 1 ? `\nCrítico! (x${multiplicadorCritico})` : '';
 
-  return `${resultadoDado}${somarHabilidade}${somarAtributo}${somarModificador} = ${exibirTotal}${exibirCritico}`;
+  return `${resultadoDado}${somarAtributo}${somarHabilidade}${somarModificador} = ${exibirTotal}${exibirCritico}`;
 };
 
 const dano = async (args, jogador, canal) => {
