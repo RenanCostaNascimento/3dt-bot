@@ -42,7 +42,7 @@ const buscarFicha = (jogador, canal) => {
   });
 };
 
-const atualizarPv = (jogador, canal, incremento, atributo) => {
+const incrementarAtributo = (jogador, canal, incremento, atributo) => {
   return new Promise((resolve, reject) => {
     const db = client.db(dbName);
     db.collection('fichas').findOneAndUpdate(
@@ -98,7 +98,7 @@ const atualizarAtributo = (jogador, canal, atributo, valor) => {
 const mongoHelper = {
   inserirFicha,
   buscarFicha,
-  atualizarPv,
+  incrementarAtributo,
   inserirItem,
   deletarItem,
   atualizarAtributo

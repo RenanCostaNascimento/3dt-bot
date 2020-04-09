@@ -1,4 +1,4 @@
-const { inserirFicha, buscarFicha, atualizarPv, inserirItem, deletarItem, atualizarAtributo } = require('./db');
+const { inserirFicha, buscarFicha, incrementarAtributo, inserirItem, deletarItem, atualizarAtributo } = require('./db');
 const rolar2d6 = require('./dado');
 
 const handleMessage = (args, jogador, canal) => {
@@ -23,6 +23,8 @@ const handleMessage = (args, jogador, canal) => {
       return pontosDeVida(args, jogador, canal);
     case 'pm':
       return pontosDeMagia(args, jogador, canal);
+    case 'po':
+      return pecasOuro(args, jogador, canal);
     case 'stats':
       return stats(jogador, canal);
     case 'add':
@@ -65,6 +67,9 @@ const ajuda = () => `
   __Recuperar ou gastar mana__
   \t\t*pm valor*
   \t\t*valor* pode ser positivo (recuperar) ou negativo (gastar)
+  __Gastar ou ganhar dinheiro__
+  \t\t*po valor*
+  \t\t*valor* pode ser positivo (ganhar) ou negativo (gastar)
   __Testar atributo__
   \t\t*test atributo modificador*
   \t\t*modificador* é um parâmetro opcional que será somado ao resultado
@@ -106,7 +111,8 @@ const criarFicha = async (args, jogador, canal) => {
       poderDeFogo: caracteristicas[4],
       pv: caracteristicas[2] * 5,
       pm: caracteristicas[2] * 5,
-      itens: []
+      itens: [],
+      po: 0
     };
     await inserirFicha(ficha);
     return 'Sua ficha foi criada';
@@ -277,7 +283,7 @@ const pontosDeVida = async (args, jogador, canal) => {
   try {
     const incremento = args[1] || 0;
     if (incremento !== 0) {
-      const { value: { pv } } = await atualizarPv(jogador, canal, Number(incremento), 'pv');
+      const { value: { pv } } = await incrementarAtributo(jogador, canal, Number(incremento), 'pv');
       const danoOuCura = incremento < 0 ? `Tomou ***${incremento}*** de dano` : `Curou ${incremento} de vida`;
       return `${danoOuCura}, novo PV é ***${pv}***`;
     }
@@ -290,7 +296,7 @@ const pontosDeMagia = async (args, jogador, canal) => {
   try {
     const incremento = args[1] || 0;
     if (incremento !== 0) {
-      const { value: { pm } } = await atualizarPv(jogador, canal, Number(incremento), 'pm');
+      const { value: { pm } } = await incrementarAtributo(jogador, canal, Number(incremento), 'pm');
       const usarOuRecuperar = incremento < 0 ? `Usou ***${incremento}*** de PM` : `Recuperou ${incremento} de PM`;
       return `${usarOuRecuperar}, novo PM é ***${pm}***`;
     }
@@ -299,9 +305,22 @@ const pontosDeMagia = async (args, jogador, canal) => {
   }
 };
 
+const pecasOuro = async (args, jogador, canal) => {
+  try {
+    const incremento = args[1] || 0;
+    if (incremento !== 0) {
+      const { value: { po } } = await incrementarAtributo(jogador, canal, Number(incremento), 'po');
+      const gastouOuGanhou = incremento < 0 ? `Gastou ***${incremento}*** POs` : `Ganhou ${incremento} POs`;
+      return `${gastouOuGanhou}, novo saldo é ***${po}***`;
+    }
+  } catch (e) {
+    return 'Você não tem personagem';
+  }
+};
+
 const stats = async (jogador, canal) => {
   try {
-    const { forca, habilidade, resistencia, armadura, poderDeFogo, pv, itens } = await buscarFicha(jogador, canal);
+    const { forca, habilidade, resistencia, armadura, poderDeFogo, pv, pm, po, itens } = await buscarFicha(jogador, canal);
     const listagemItens = itens.map(({ nome, atributoBonus, atributoValor }) => `\n\t\t- ${nome} (${atributoBonus}): ${atributoValor}`);
 
     return `
@@ -311,6 +330,8 @@ const stats = async (jogador, canal) => {
     Armadura: ${armadura}
     Poder de Fogo: ${poderDeFogo}
     PV: ${pv}
+    PM: ${pm}
+    PO: ${po}
     Itens: ${listagemItens.toString()}
     `;
   } catch (e) {
