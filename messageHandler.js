@@ -123,12 +123,19 @@ const forcaAtaqueLonge = async (jogador, canal) => {
 
 const forcaDefesa = async (jogador, canal) => {
   try {
-    const { armadura, habilidade } = await buscarFicha(jogador, canal);
+    const { armadura, habilidade, itens } = await buscarFicha(jogador, canal);
+    const bonusFd = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'fd')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusArmadura = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'armadura')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
+    const totalArmadura = armadura + bonusArmadura;
+    const total = primeiraRolagem + segundaRolagem + habilidade + (totalArmadura * multiplicadorCritico) + bonusFd;
 
-    const total = primeiraRolagem + segundaRolagem + habilidade + (armadura * multiplicadorCritico);
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, armadura, 'A');
-
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, totalArmadura, 'A', bonusFd);
     return `Força de Defesa - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
