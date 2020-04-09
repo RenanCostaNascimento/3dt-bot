@@ -11,6 +11,8 @@ const handleMessage = (args, jogador, canal) => {
       return forcaAtaquePerto(args, jogador, canal);
     case 'fap':
       return forcaAtaqueLonge(args, jogador, canal);
+    case 'am':
+      return ataqueMagico(args, jogador, canal);
     case 'fd':
       return forcaDefesa(args, jogador, canal);
     case 'dm':
@@ -213,6 +215,40 @@ const forcaDefesa = async (args, jogador, canal) => {
   } catch (e) {
     return 'Você não tem personagem';
   }
+};
+
+const ataqueMagico = async (args, jogador, canal) => {
+  if (args.length === 2) {
+    try {
+      const pmsGastos = Number(args[1]) || 0;
+      const { pm, itens, habilidade } = await buscarFicha(jogador, canal);
+
+      if (pmsGastos === 0 || pmsGastos > pm) {
+        return `Seus PMs atuais (${pm}) são insuficientes pra conjurar essa magia`;
+      }
+
+      const bonusHabilidade = itens
+        .filter(({ atributoBonus }) => atributoBonus === 'h')
+        .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+      const habilidadeTotal = habilidade + bonusHabilidade;
+      const limiteMagico = habilidadeTotal === 0 ? 3 : habilidadeTotal * 5;
+
+      if (pmsGastos > limiteMagico) {
+        return `Seu limite de PMs gastos em uma única magia é de ${limiteMagico}`;
+      }
+
+      const { value: { pm: pmsRestantes } } = await incrementarAtributo(jogador, canal, -pmsGastos, 'pm');
+
+      const { primeiraRolagem, segundaRolagem } = rolar2d6();
+      const total = primeiraRolagem + segundaRolagem + habilidadeTotal + pmsGastos;
+      const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, 0, habilidadeTotal, 0, undefined, pmsGastos);
+      
+      return `Ataque Mágico - ${resultadoDado}\nPMs restantes: ${pmsRestantes}`;
+    } catch (e) {
+      return 'Você não tem personagem';
+    }
+  }
+  return;
 };
 
 const iniciativa = async (jogador, canal) => {
