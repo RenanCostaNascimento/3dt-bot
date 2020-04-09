@@ -101,14 +101,18 @@ const forcaAtaquePerto = async (jogador, canal) => {
       .filter(({ atributoBonus }) => atributoBonus === 'faf')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
     const bonusForca = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'forca')
+      .filter(({ atributoBonus }) => atributoBonus === 'f')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusHabilidade = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'h')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
     const forcaTotal = forca + bonusForca;
-    const total = primeiraRolagem + segundaRolagem + habilidade + (forcaTotal * multiplicadorCritico) + bonusFa;
+    const habilidadeTotal = habilidade + bonusHabilidade;
+    const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (forcaTotal * multiplicadorCritico) + bonusFa;
 
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, forcaTotal, 'F', bonusFa);
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidadeTotal, forcaTotal, 'F', bonusFa);
     return `Força de Ataque (Força) - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
@@ -122,14 +126,18 @@ const forcaAtaqueLonge = async (jogador, canal) => {
       .filter(({ atributoBonus }) => atributoBonus === 'fap')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
     const bonusPdF = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'pdf')
+      .filter(({ atributoBonus }) => atributoBonus === 'p')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusHabilidade = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'h')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
     const totalPdF = poderDeFogo + bonusPdF;
-    const total = primeiraRolagem + segundaRolagem + habilidade + (totalPdF * multiplicadorCritico) + bonusFa;
+    const habilidadeTotal = habilidade + bonusHabilidade;
+    const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (totalPdF * multiplicadorCritico) + bonusFa;
 
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, totalPdF, 'PdF', bonusFa);
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidadeTotal, totalPdF, 'PdF', bonusFa);
     return `Força de Ataque (Poder de Fogo) - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
@@ -143,14 +151,18 @@ const forcaDefesa = async (jogador, canal) => {
       .filter(({ atributoBonus }) => atributoBonus === 'fd')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
     const bonusArmadura = itens
-      .filter(({ atributoBonus }) => atributoBonus === 'armadura')
+      .filter(({ atributoBonus }) => atributoBonus === 'a')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusHabilidade = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'h')
       .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
     const totalArmadura = armadura + bonusArmadura;
-    const total = primeiraRolagem + segundaRolagem + habilidade + (totalArmadura * multiplicadorCritico) + bonusFd;
+    const habilidadeTotal = habilidade + bonusHabilidade;
+    const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (totalArmadura * multiplicadorCritico) + bonusFd;
 
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, totalArmadura, 'A', bonusFd);
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidadeTotal, totalArmadura, 'A', bonusFd);
     return `Força de Defesa - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
