@@ -102,12 +102,19 @@ const forcaAtaquePerto = async (jogador, canal) => {
 
 const forcaAtaqueLonge = async (jogador, canal) => {
   try {
-    const { poderDeFogo, habilidade } = await buscarFicha(jogador, canal);
+    const { poderDeFogo, habilidade, itens } = await buscarFicha(jogador, canal);
+    const bonusFa = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'fap')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+    const bonusPdF = itens
+      .filter(({ atributoBonus }) => atributoBonus === 'pdf')
+      .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6();
+    const totalPdF = poderDeFogo + bonusPdF;
+    const total = primeiraRolagem + segundaRolagem + habilidade + (totalPdF * multiplicadorCritico) + bonusFa;
 
-    const total = primeiraRolagem + segundaRolagem + habilidade + (poderDeFogo * multiplicadorCritico);
-    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, poderDeFogo, 'PdF');
-
+    const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, totalPdF, 'PdF', bonusFa);
     return `Força de Ataque (Poder de Fogo) - ${resultadoDado}`;
   } catch (e) {
     return 'Você não tem personagem';
@@ -229,7 +236,7 @@ const addItem = async (args, jogador, canal) => {
         atributoValor: Number(atributoValor)
       };
       await adicionarItem(jogador, canal, item);
-      return 'Item adicionando';
+      return 'Item adicionado';
     } catch (e) {
       return 'Você não tem personagem';
     }
