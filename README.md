@@ -6,7 +6,7 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 - É preciso ter uma ficha criada para executar a maioria dos comandos;
 - A maioria dos comandos são executados levando em conta o contexto do jogador que rodou o comando. Exemplo: usar o comando *faf* irá rolar um ataque com os atributos da ficha do jogador que escreveu o comando.
 
-###Criar uma ficha
+### Criar uma ficha
 **Descrição**: Cria uma ficha. Se você já tiver uma ficha e criar outra, a primeira ficha será substituída pela segunda.
 **Comando**: *ficha força,habilidade,resistência,armadura,poderdefogo*
 **Exemplo**: *ficha 5,5,5,5,5*
@@ -24,7 +24,7 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 
 **Comando**: *set atributo novoValor*
 **Exemplo**: *set f 3* => atualiza força para 3
-###Atacar
+### Atacar
 **Descrição**: Realiza um ataque (força de ataque), podendo ser baseado em força, poder de fogo ou magia (Ataque Mágico).
 - *ae* é um parâmetro opcional indicando que é um ataque especial, só é usado se você tiver esse item no inventário. Além disso, você deve ter ao menos 1 PM para usa esse movimento.
 - *quantidadePms* indica quantos PMs serão usados na magia. Você deve ter PMs suficientes para usar esse movimento.
@@ -37,13 +37,13 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 - Usando Ataque Mágico:
 *am quantidadePms*
 
-###Defender
+### Defender
 **Descrição**: Realiza uma defesa (força de defesa).
 - *sh* é um parâmetro opcional para defender sem habilidade
 
 **Comando**: *fd sh*
 
-###Iniciativa
+### Iniciativa
 **Descrição**: Rola iniciativa.
 **Comando**: *ini*
 
@@ -57,21 +57,21 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 - *pv 3* => cura 3 de vida
 - *pv -5* => toma 5 de dano
 
-###Recuperar ou gastar mana (PM)
+### Recuperar ou gastar mana (PM)
 **Descrição**: Aumenta ou diminuiu os PMs atuais.
 - *valor* pode ser positivo (recuperar) ou negativo (gastar)
 - Não é necessário adicionar  o sinal de adição no comando*valor*  quando quiser recuperar.
 
 **Comando**:*pm valor*
 
-###Gastar ou ganhar dinheiro (PO)
+### Gastar ou ganhar dinheiro (PO)
 **Descrição**: Aumenta ou diminuiu as POs atuais.
 - *valor* pode ser positivo (ganhar) ou negativo (gastar)
 - Não é necessário adicionar  o sinal de adição no comando*valor*  quando quiser ganhar.
 
 **Comando**: *pm valor*
 
-###Gastar ou ganhar ponto heróico (PH)
+### Gastar ou ganhar ponto heróico (PH)
 **Descrição**: Aumenta ou diminuiu os PHs atuais. Há duas formas de modificar seus PHs, diretamente ou durante as rolagens.
 - Diretamente: nesse caso o comando funciona semelhante aos de PV, PM e PO.
  - *valor* pode ser positivo (ganhar) ou negativo (gastar)
@@ -91,7 +91,7 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 	- *fd&ast;* => defesa com sucesso decisivo
 	- *faf&ast;&ast; ae* => força de ataque corpo-a-corpo com sucesso devastador e ataque especial
 
-###Testar atributo
+### Testar atributo
 **Descrição**: Faz um teste da um atributo qualquer. Normalmente usado para perícia, esquiva, etc.
 - *modificador* é um parâmetro opcional que será somado ao resultado
 - Possíveis valores para atributo: 
@@ -106,7 +106,7 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 **Comando**: *test atributo modificador*
 **Exemplo**: *test h 3* => teste de habilidade +3
 
-###Adicionar item/vantagem
+### Adicionar item/vantagem
 **Descrição**: Adiciona um item ao seu inventário. Vantagens e itens são tratados da mesma forma. Pense no item como um buff que irá aumentar/diminuir algum atributo em algum valor.
 - *nome* pode ser qualquer coisa, é o identificador do item. Não tem nenhum impacto no gameplay.
 - *atributo* indica que caractística será afetada por esse item. Terá impacto durante suas rolagens. Possíveis valores para atributo:
@@ -128,7 +128,7 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 - *add ataqueEspecial aef 4* => adiciona a vantagem de ataque especial que dá F+4 quando usada
 - *add espelhoEstranho* => adicionar um espelho estranho no inventário, apenas para registro
   
-###Remover item/vantagem
+### Remover item/vantagem
 **Descrição**: Remove um item do inventário. Se você tiver vários itens com o mesmo nome, todos serão removidos.
 **Comando**: *rm nome*
 **Exemplo**: *rm espelhoMagico*
@@ -145,5 +145,5 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 - *dm 3 0* => 2d6 + Atr(3) - teste de atributo, defender sem H
 - *dm 2 1 3* => 2d6 + Atr(2) + H(1) + Mod(3)
 
-#Repositório Original
+# Repositório Original
 Fiz um fork desse repositório https://github.com/endarthur/3dt-bot
