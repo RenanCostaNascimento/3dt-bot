@@ -40,8 +40,14 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 ### Defender
 **Descrição**: Realiza uma defesa (força de defesa).
 - *sh* é um parâmetro opcional para defender sem habilidade
+- *sa* é um parâmetro opcional para defender sem armadura
+- *ae* é um parâmetro opcional para defender com armadura extra
+- Os parâmetros opcionais podem ser passados em qualquer ordem
 
-**Comando**: *fd sh*
+**Comando**: *fd sh sa ae*
+**Exemplos**:
+- *fd sh* => defender sem habilidade, pois errou na esquiva
+- *fd ae sh* => defender com armadura extre e sem habilidade, pois está indefeso
 
 ### Iniciativa
 **Descrição**: Rola iniciativa.

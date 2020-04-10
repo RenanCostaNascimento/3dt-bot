@@ -186,20 +186,44 @@ const forcaAtaqueLonge = async (args, jogador, canal) => {
   }
 };
 
+const checkVariocoesDefesa = (args) => {
+  /**
+   * sh = sem habilidade
+   * sa = sem armadura
+   * ae = armadura extra
+   */
+  const possiveisVariacoes = ['sh', 'sa', 'ae'];
+  const variacoes = {};
+  args.forEach(arg => {
+    if (possiveisVariacoes.some((variacao) => variacao === arg)) {
+      variacoes[arg] = true;
+    }
+  });
+
+  return variacoes;
+};
+
+
 const forcaDefesa = async (args, jogador, canal) => {
+  const [comando, ...rest] = args;
+
   try {
     const { armadura, habilidade, itens, ph } = await buscarFicha(jogador, canal);
 
-    const criticoAutomatico = args[0].match(/\*/gi);
+    const criticoAutomatico = comando.match(/\*/gi);
     const quantidadeCriticos = criticoAutomatico ? criticoAutomatico.length : 0;
     if (quantidadeCriticos > ph) {
-      return 'Você não tem PH suficiente para esse ataque';
+      return 'Você não tem PH suficiente para esse movimento';
     }
 
     const bonusFd = somarAtributosItens(itens, 'fd');
     const bonusArmadura = somarAtributosItens(itens, 'a');
     const bonusHabilidade = somarAtributosItens(itens, 'h');
-    const multiplicadorHabilidade = args[1] === 'sh' ? 0 : 1;
+
+    const { sh: semHabilidade, sa: semArmadura, ae: armaduraExtra } = checkVariocoesDefesa(rest);
+    const multiplicadorHabilidade = semHabilidade ? 0 : 1;
+    const multiplicadorArmadura = semArmadura ? 0 : 1;
+    const multiplicadorArmaduraExtra = armaduraExtra ? 2 : 1;
 
     let phsRestantes = '';
     if (quantidadeCriticos > 0) {
@@ -208,7 +232,7 @@ const forcaDefesa = async (args, jogador, canal) => {
     }
 
     const { primeiraRolagem, segundaRolagem, multiplicadorCritico } = rolar2d6(quantidadeCriticos);
-    const totalArmadura = armadura + bonusArmadura;
+    const totalArmadura = (armadura + bonusArmadura) * multiplicadorArmadura * multiplicadorArmaduraExtra;
     const habilidadeTotal = (habilidade + bonusHabilidade) * multiplicadorHabilidade;
     const total = primeiraRolagem + segundaRolagem + habilidadeTotal + (totalArmadura * multiplicadorCritico) + bonusFd;
 
