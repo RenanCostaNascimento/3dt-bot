@@ -50,75 +50,7 @@ const handleMessage = (args, jogador, canal) => {
   }
 };
 
-const ajuda = () => `
-  __Criar uma ficha__
-  \t\t*ficha força,habilidade,resistência,armadura,poderdefogo*
-  \t\tExemplo: ***ficha 5,5,5,5,5***
-  \t\tCada jogador só pode ter uma ficha por canal
-  \t\tSe você já tiver uma ficha e criar outra, a primeira ficha será substituída pela segunda
-  __Mostrar sua ficha__
-  \t\t*stats*
-  __Atualizar atributo__
-  \t\t*set atributo novoValor*
-  \t\tExemplo: ***set f 3***
-  \t\tPossíveis valores para atributo: f/h/a/r/p
-  __Atacar__
-  \t\t- Usando força:
-  \t\t\t\t*faf ae*
-  \t\t- Usando Poder de Fogo:
-  \t\t\t\t*fap ae*
-  \t\t*ae* é um parâmetro opcional indicando que é um ataque especial, só é usado se você tiver esse item
-  \t\t- Usando Ataque Mágico:
-  \t\t\t\t*am quantidadePms*
-  __Defender__
-  \t\t*fd sh*
-  \t\t*sh* é um parâmetro opcional para defender sem habilidade
-  __Iniciativa__
-  \t\t*ini*
-  __Curar ou tomar dano__
-  \t\t*pv valor*
-  \t\t*valor* pode ser positivo (cura) ou negativo (dano)
-  __Recuperar ou gastar mana__
-  \t\t*pm valor*
-  \t\t*valor* pode ser positivo (recuperar) ou negativo (gastar)
-  __Gastar ou ganhar dinheiro__
-  \t\t*po valor*
-  \t\t*valor* pode ser positivo (ganhar) ou negativo (gastar)
-  __Gastar ou ganhar ponto heróico__
-  \t\t- Diretamente
-  \t\t\t\t*ph valor*
-  \t\t\t\t*valor* pode ser positivo (ganhar) ou negativo (gastar)
-  \t\t- Nas rolagens
-  \t\t\t\tÉ só adicionar um ou dois asterisco depois do comando de rolagem
-  \t\t\t\tExemplo: ***fd*****: defesa com sucesso devastador
-  __Testar atributo__
-  \t\t*test atributo modificador*
-  \t\t*modificador* é um parâmetro opcional que será somado ao resultado
-  \t\tExemplo: ***test h 3*** => teste de habilidade +3
-  \t\tPossíveis valores para atributo: f/h/a/r/p
-  __Adicionar item/vantagem__ (serão tratados da mesma forma)
-  \t\t*add nome atributo valor*
-  \t\tExemplo: ***add Arco fap 1***
-  \t\tPossíveis valores para atributo:
-  \t\t\t\t- faf: bônus em força de ataque para força
-  \t\t\t\t- fap: bônus em força de ataque para pdf
-  \t\t\t\t- fd: bônus em força de defesa
-  \t\t\t\t- ini: bônus de iniciativa
-  \t\t\t\t- f/h/a/r/p: bônus no atributo (conta para ataque, defesa e testes)
-  \t\t\t\t- aef: ataque especial de força (nesse caso o *valor* indica o aumento de força, não o nível da vantagem)
-  \t\t\t\t- aep: ataque especial de pdf (idem)
-  __Remover item/vantagem__
-  \t\t*rm nome*
-  \t\tSe você tiver vários itens com o mesmo nome, todos serão removidos
-  __Rolagem do mestre (DM)__
-  \t\t*dm atributoCritavel atributoNaoCritavel modificador*
-  \t\t*atributoCritavel* indica qual valor será dobrado/triplicado em caso de crítico, normalmente F, A, ou PdF
-  \t\t*modificador* é um parâmetro opcional que será somado ao resultado
-  \t\tExemplo: ***dm 2 3*** => 2d6 + Atr(2) + H(3) - usado para ataque e defesa
-  \t\tExemplo: ***dm 0 3*** => 2d6 + H(3) - iniciativa, defender sem A
-  \t\tExemplo: ***dm 3 0*** => 2d6 + Atr(3) - teste de atributo, defender sem H
-  \t\tExemplo: ***dm 2 1 3*** => 2d6 + Atr(2) + H(1) + Mod(3)
-`;
+const ajuda = () => 'Para a lista completa de comando acesse https://github.com/RenanCostaNascimento/3dt-bot#como-usar';
 
 const criarFicha = async (args, jogador, canal) => {
   if (args.length === 2) {
