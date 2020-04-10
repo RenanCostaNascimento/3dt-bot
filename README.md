@@ -1,7 +1,7 @@
 # 3D&amp;Bot
 Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa descrita nesse PDF. As modificações de regras foram escritas por Ivan, O Grande.
 #Como usar
-###Pontos Importantes
+### Pontos Importantes
 - Cada jogador só pode ter uma ficha por canal do Discord;
 - É preciso ter uma ficha criada para executar a maioria dos comandos;
 - A maioria dos comandos são executados levando em conta o contexto do jogador que rodou o comando. Exemplo: usar o comando *faf* irá rolar um ataque com os atributos da ficha do jogador que escreveu o comando.
