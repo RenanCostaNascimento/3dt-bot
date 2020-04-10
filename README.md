@@ -138,7 +138,7 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 **Comando**: *rm nome*
 **Exemplo**: *rm espelhoMagico*
 
-###Rolagem do mestre (DM)
+### Rolagem do mestre (DM)
 **Descrição**: Comando para auxiliar o mestre. É um comando de rolagem bem genérico, podendo ser utilizado para muitos fins. Esse comando não precisa de uma ficha criada para funcionar, e mesmo que o jogador que o execute tenha um ficha, ela não será usada para calcular os valores.
 - *atributoCritavel* indica qual valor será dobrado/triplicado em caso de crítico, normalmente F, A, R ou PdF
 - *modificador* é um parâmetro opcional que será somado ao resultado
