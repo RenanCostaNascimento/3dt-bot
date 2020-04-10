@@ -47,7 +47,7 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 **Descrição**: Rola iniciativa.
 **Comando**: *ini*
 
-###Curar ou tomar dano (PV)
+### Curar ou tomar dano (PV)
 **Descrição**: Aumenta ou diminuiu os PVs atuais. Se ao tomar dano seu novo PV chegar à -10, é game over, seu personagem será excluído.
 - *valor* pode ser positivo (cura) ou negativo (dano)
 - Não é necessário adicionar  o sinal de adição no comando*valor*  quando quiser curar.
