@@ -118,7 +118,6 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
   - aef: ataque especial de força (nesse caso o *valor* indica o aumento de força, não o nível da vantagem)
   - aep: ataque especial de pdf (idem)
 - *valor* indica em quanto o atributo impactará nas rolagens
-- Tanto *atributo* quanto *valor* são opcionais
 
 **Comando**: *add nome atributo valor*
 **Exemplos**:
@@ -126,7 +125,7 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 - *add protecaoMagica a 3* => adiciona o buff proteção mágica que dá A+3
 - *add aceleracao ini 1* => adiciona a vantagem aceleração que dá +1 em iniciativa
 - *add ataqueEspecial aef 4* => adiciona a vantagem de ataque especial que dá F+4 quando usada
-- *add espelhoEstranho* => adicionar um espelho estranho no inventário, apenas para registro
+- *add potion qtd 1* => adicionar um potion no inventário, apenas para registro
   
 ### Remover item/vantagem
 **Descrição**: Remove um item do inventário. Se você tiver vários itens com o mesmo nome, todos serão removidos.

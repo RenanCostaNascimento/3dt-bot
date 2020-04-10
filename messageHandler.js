@@ -50,7 +50,7 @@ const handleMessage = (args, jogador, canal) => {
   }
 };
 
-const ajuda = () => 'Para a lista completa de comando acesse https://github.com/RenanCostaNascimento/3dt-bot#como-usar';
+const ajuda = () => 'Para a lista completa de comandos, acesse https://github.com/RenanCostaNascimento/3dt-bot#como-usar';
 
 const criarFicha = async (args, jogador, canal) => {
   if (args.length === 2) {
