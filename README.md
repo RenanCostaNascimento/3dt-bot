@@ -79,19 +79,19 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 
 ### Gastar ou ganhar ponto heróico (PH)
 **Descrição**: Aumenta ou diminuiu os PHs atuais. Há duas formas de modificar seus PHs, diretamente ou durante as rolagens.
-- Diretamente: nesse caso o comando funciona semelhante aos de PV, PM e PO.
- - *valor* pode ser positivo (ganhar) ou negativo (gastar)
- - Não é necessário adicionar  o sinal de adição no comando*valor*  quando quiser ganhar.
+ - Diretamente: nesse caso o comando funciona semelhante aos de PV, PM e PO.
+ 	- *valor* pode ser positivo (ganhar) ou negativo (gastar)
+ 	- Não é necessário adicionar  o sinal de adição no comando*valor*  quando quiser ganhar.
 
 	**Comando**: *ph valor*
 
 - Nas rolagens: nesse caso você nunca ganha PH, apenas usa. Para adicionar sucessos automáticos nas suas rolagens basta colocar um ou dois asteriscos depois do comando de rolagem. Funciona com os seguintes comando:
- - faf
- - fap
- - am
- - fd
- - dm
- - test
+	- faf
+	- fap
+	- am
+	- fd
+	- dm
+	- test
 
 	**Exemplos**:
 	- *fd&ast;* => defesa com sucesso decisivo
