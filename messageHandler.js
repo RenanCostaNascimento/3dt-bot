@@ -310,7 +310,11 @@ const dicionarioAtributo = {
   h: { nome: 'habilidade', descricao: 'Habilidade' },
   r: { nome: 'resistencia', descricao: 'Resistência' },
   a: { nome: 'armadura', descricao: 'Armadura' },
-  p: { nome: 'poderDeFogo', descricao: 'Poder de Fogo' }
+  p: { nome: 'poderDeFogo', descricao: 'Poder de Fogo' },
+  pv: { nome: 'pv', descricao: 'PV' },
+  pm: { nome: 'pm', descricao: 'PM' },
+  po: { nome: 'po', descricao: 'PO' },
+  ph: { nome: 'ph', descricao: 'PH' }
 };
 
 const teste = async (args, jogador, canal) => {
