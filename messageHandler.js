@@ -90,7 +90,7 @@ const dungeonMaster = async (args) => {
     const total = primeiraRolagem + segundaRolagem + habilidade + (atributo * multiplicadorCritico) + modificador;
     const resultadoDado = construirResultadoDado(primeiraRolagem, segundaRolagem, total, multiplicadorCritico, habilidade, atributo, 'Atr', modificador);
 
-    return `Rolagem do Monstro - ${resultadoDado}`;
+    return `Rolagem do Mestre - ${resultadoDado}`;
   }
 };
 

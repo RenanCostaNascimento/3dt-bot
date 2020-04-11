@@ -10,10 +10,10 @@ Um bot de discord para jogar 3D&T. Esse bot usa a regra de combate alternativa d
 **Descrição**: Cria uma ficha. Se você já tiver uma ficha e criar outra, a primeira ficha será substituída pela segunda.
 **Comando**: *ficha força,habilidade,resistência,armadura,poderdefogo*
 **Exemplo**: *ficha 5,5,5,5,5*
-###Mostrar ficha
+### Mostrar ficha
 **Descrição**: Mostra a ficha do jogador que executou o comando.
 **Comando**: *stats*
-###Atualizar atributo
+### Atualizar atributo
 **Descrição**: Atualiza um atributo para o valor especificado. 
 - Possíveis valores para atributo:
  - f (força)
