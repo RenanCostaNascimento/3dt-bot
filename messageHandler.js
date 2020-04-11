@@ -49,6 +49,7 @@ const ajuda = () => 'Para a lista completa de comandos, acesse https://github.co
 const criarFicha = async (args, jogador, canal) => {
   if (args.length === 2) {
     const caracteristicas = args[1].split(',').map(parseFloat);
+    const pvPm = caracteristicas[2] * 5;
     const ficha = {
       jogador, canal,
       forca: caracteristicas[0],
@@ -56,8 +57,10 @@ const criarFicha = async (args, jogador, canal) => {
       resistencia: caracteristicas[2],
       armadura: caracteristicas[3],
       poderDeFogo: caracteristicas[4],
-      pv: caracteristicas[2] * 5,
-      pm: caracteristicas[2] * 5,
+      pv: pvPm,
+      pvmax: pvPm,
+      pm: pvPm,
+      pmmax: pvPm,
       po: 0,
       ph: 3,
       itens: [
@@ -306,7 +309,11 @@ const dicionarioAtributo = {
   a: { nome: 'armadura', descricao: 'Armadura' },
   p: { nome: 'poderDeFogo', descricao: 'Poder de Fogo' },
   pv: { nome: 'pv', descricao: 'PV' },
+  maxpv: { nome: 'pvmax', descricao: 'Máx PV' },
+  pvmax: { nome: 'pvmax', descricao: 'Máx PV' },
   pm: { nome: 'pm', descricao: 'PM' },
+  maxpm: { nome: 'pmmax', descricao: 'Máx PM' },
+  pmmax: { nome: 'pmmax', descricao: 'Máx PM' },
   po: { nome: 'po', descricao: 'PO' },
   ph: { nome: 'ph', descricao: 'PH' }
 };
@@ -364,15 +371,25 @@ const incAtributo = async (args, jogador, canal) => {
       return 'Atributo inválido';
     }
 
-    const incremento = Number(args[2] || 0);
+    let incremento = Number(args[2] || 0);
     if (incremento !== 0) {
-      const { value } = await incrementarAtributo(jogador, canal, incremento, atributo.nome);
-      const novoValor = value[atributo.nome] + incremento;
-      if (atributo.nome === 'pv' && novoValor <= -10) {
+      const { nome, descricao } = atributo;
+      if (nome === 'pv' || nome === 'pm') {
+        const ficha = await buscarFicha(jogador, canal);
+        const novoValorPossivel = incremento + ficha[nome];
+        const nomeMaxAtributo = `${nome}max`;
+        incremento = novoValorPossivel <= ficha[nomeMaxAtributo] ? incremento : ficha[nomeMaxAtributo] - ficha[nome];
+      }
+
+      const { value } = await incrementarAtributo(jogador, canal, incremento, nome);
+      const novoValor = value[nome] + incremento;
+
+      if (nome === 'pv' && novoValor <= -10) {
         await removerFicha(jogador, canal);
         return 'GAME OVER';
       }
-      return `${atributo.descricao} modificado: ***${value[atributo.nome]} => ${novoValor}***`;
+      
+      return `${descricao} modificado: ***${value[nome]} => ${novoValor}***`;
     }
   } catch (e) {
     return 'Você não tem personagem';
@@ -381,7 +398,7 @@ const incAtributo = async (args, jogador, canal) => {
 
 const stats = async (jogador, canal) => {
   try {
-    const { forca, habilidade, resistencia, armadura, poderDeFogo, pv, pm, po, ph, itens } = await buscarFicha(jogador, canal);
+    const { forca, habilidade, resistencia, armadura, poderDeFogo, pv, pvmax, pm, pmmax, po, ph, itens } = await buscarFicha(jogador, canal);
     const listagemItens = itens.map(({ nome, atributoBonus, atributoValor }) => `\n\t\t- ${nome} (${atributoBonus}): ${atributoValor}`);
 
     return `
@@ -390,8 +407,8 @@ const stats = async (jogador, canal) => {
     Resistencia: ${resistencia}
     Armadura: ${armadura}
     Poder de Fogo: ${poderDeFogo}
-    PV: ${pv}
-    PM: ${pm}
+    PV: ${pv} / ${pvmax}
+    PM: ${pm} / ${pmmax}
     PO: ${po}
     PH: ${ph}
     Itens: ${listagemItens.toString()}
