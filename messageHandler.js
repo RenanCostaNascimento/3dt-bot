@@ -29,14 +29,8 @@ const handleMessage = (args, jogador, canal) => {
       return iniciativa(jogador, canal);
     case 'test':
       return teste(args, jogador, canal);
-    case 'pv':
-      return pontosDeVida(args, jogador, canal);
-    case 'pm':
-      return pontosDeMagia(args, jogador, canal);
-    case 'po':
-      return pecasOuro(args, jogador, canal);
-    case 'ph':
-      return pontosHeroicos(args, jogador, canal);
+    case 'inc':
+      return incAtributo(args, jogador, canal);
     case 'stats':
       return stats(jogador, canal);
     case 'add':
@@ -363,56 +357,22 @@ const construirResultadoDado = (primeiraRolagem, segundaRolagem, total, multipli
   return `${resultadoDado}${somarAtributo}${somarHabilidade}${somarModificador} = ${exibirTotal}${exibirCritico}`;
 };
 
-const pontosDeVida = async (args, jogador, canal) => {
+const incAtributo = async (args, jogador, canal) => {
   try {
-    const incremento = args[1] || 0;
+    const atributo = dicionarioAtributo[args[1]];
+    if (!atributo) {
+      return 'Atributo inválido';
+    }
+
+    const incremento = Number(args[2] || 0);
     if (incremento !== 0) {
-      const { value: { pv } } = await incrementarAtributo(jogador, canal, Number(incremento), 'pv');
-      if (pv <= -10) {
+      const { value } = await incrementarAtributo(jogador, canal, incremento, atributo.nome);
+      const novoValor = value[atributo.nome] + incremento;
+      if (atributo.nome === 'pv' && novoValor <= -10) {
         await removerFicha(jogador, canal);
         return 'GAME OVER';
       }
-      const danoOuCura = incremento < 0 ? `Tomou ***${incremento}*** de dano` : `Curou ${incremento} de vida`;
-      return `${danoOuCura}, novo PV é ***${pv}***`;
-    }
-  } catch (e) {
-    return 'Você não tem personagem';
-  }
-};
-
-const pontosDeMagia = async (args, jogador, canal) => {
-  try {
-    const incremento = args[1] || 0;
-    if (incremento !== 0) {
-      const { value: { pm } } = await incrementarAtributo(jogador, canal, Number(incremento), 'pm');
-      const usarOuRecuperar = incremento < 0 ? `Usou ***${incremento}*** de PM` : `Recuperou ${incremento} de PM`;
-      return `${usarOuRecuperar}, novo PM é ***${pm}***`;
-    }
-  } catch (e) {
-    return 'Você não tem personagem';
-  }
-};
-
-const pecasOuro = async (args, jogador, canal) => {
-  try {
-    const incremento = args[1] || 0;
-    if (incremento !== 0) {
-      const { value: { po } } = await incrementarAtributo(jogador, canal, Number(incremento), 'po');
-      const gastouOuGanhou = incremento < 0 ? `Gastou ***${incremento}*** POs` : `Ganhou ${incremento} POs`;
-      return `${gastouOuGanhou}, novo saldo é ***${po}***`;
-    }
-  } catch (e) {
-    return 'Você não tem personagem';
-  }
-};
-
-const pontosHeroicos = async (args, jogador, canal) => {
-  try {
-    const incremento = args[1] || 0;
-    if (incremento !== 0) {
-      const { value: { ph } } = await incrementarAtributo(jogador, canal, Number(incremento), 'ph');
-      const gastouOuGanhou = incremento < 0 ? `Gastou ***${incremento}*** PHs` : `Meu herói! Ganhou ${incremento} PHs`;
-      return `${gastouOuGanhou}, novo saldo é ***${ph}***`;
+      return `${atributo.descricao} modificado: ***${value[atributo.nome]} => ${novoValor}***`;
     }
   } catch (e) {
     return 'Você não tem personagem';

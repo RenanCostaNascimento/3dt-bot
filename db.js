@@ -60,7 +60,7 @@ const incrementarAtributo = (jogador, canal, incremento, atributo) => {
     db.collection('fichas').findOneAndUpdate(
       { jogador: jogador, canal: canal },
       { $inc: { [atributo]: incremento } },
-      { returnOriginal: false },
+      { returnOriginal: true },
       (err, result) => {
         if (err) { console.log('erro ao atualizar pv', err); return reject(err); }
         resolve(result);
