@@ -1,4 +1,4 @@
-const rolar2d6 = (quantidadeCriticos = 0) => {
+const rolar2d6 = (quantidadeCriticos = 0, valorCritico = 6) => {
   const rolagens = [];
   let multiplicadorCritico = 1;
 
@@ -9,7 +9,7 @@ const rolar2d6 = (quantidadeCriticos = 0) => {
       rolagens.push(6);
     } else {
       const rolagem = Math.floor((Math.random() * 6) + 1);
-      if (rolagem === 6) {
+      if (rolagem >= valorCritico) {
         multiplicadorCritico++;
       }
       rolagens.push(rolagem);
