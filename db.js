@@ -68,27 +68,14 @@ const incrementarAtributo = (jogador, canal, incremento, atributo) => {
   });
 };
 
-const inserirItem = (jogador, canal, item) => {
+const inserirItem = (jogador, canal, lista, elemento) => {
   return new Promise((resolve, reject) => {
     const db = client.db(dbName);
     db.collection('fichas').updateOne(
       { jogador: jogador, canal: canal },
-      { $push: { itens: item } },
+      { $push: { [lista]: elemento } },
       (err, result) => {
-        if (err) { console.log('erro ao inserir item', err); return reject(err); }
-        resolve(result);
-      });
-  });
-};
-
-const deletarItem = (jogador, canal, nomeItem) => {
-  return new Promise((resolve, reject) => {
-    const db = client.db(dbName);
-    db.collection('fichas').updateOne(
-      { jogador: jogador, canal: canal },
-      { $pull: { itens: { nome: nomeItem } } },
-      (err, result) => {
-        if (err) { console.log('erro ao deletar item', err); return reject(err); }
+        if (err) { console.log('erro ao inserir elemento na lista', err); return reject(err); }
         resolve(result);
       });
   });
@@ -113,7 +100,6 @@ const mongoHelper = {
   buscarFicha,
   incrementarAtributo,
   inserirItem,
-  deletarItem,
   atualizarAtributo
 };
 

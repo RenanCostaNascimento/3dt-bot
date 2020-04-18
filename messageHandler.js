@@ -4,7 +4,6 @@ const {
   buscarFicha,
   incrementarAtributo,
   inserirItem,
-  deletarItem,
   atualizarAtributo
 } = require('./db');
 const rolar2d6 = require('./dado');
@@ -34,9 +33,11 @@ const handleMessage = (args, jogador, canal) => {
     case 'stats':
       return stats(jogador, canal);
     case 'add':
-      return addItem(args, jogador, canal);
+      return add(args, jogador, canal);
     case 'rm':
       return removeItem(args, jogador, canal);
+    case 'ls':
+      return ls(args, jogador, canal);
     case 'set':
       return setAtributo(args, jogador, canal);
     default:
@@ -63,10 +64,8 @@ const criarFicha = async (args, jogador, canal) => {
       pmmax: pvPm,
       po: 0,
       ph: 3,
-      itens: [
-        { nome: 'Ataque Especial Básico - Força', atributoBonus: 'aef', atributoValor: 1 },
-        { nome: 'Ataque Especial Básico - PdF', atributoBonus: 'aep', atributoValor: 1 }
-      ]
+      itens: [],
+      vantagens: []
     };
     await inserirFicha(ficha);
     return 'Sua ficha foi criada';
@@ -92,12 +91,12 @@ const dungeonMaster = async (args) => {
 };
 
 const somarAtributosItens = (itens, atributo) => itens
-  .filter(({ atributoBonus }) => atributoBonus === atributo)
-  .reduce((acc, { atributoValor }) => { return acc + atributoValor; }, 0);
+  .filter(({ atributo: atributoItem }) => atributoItem === atributo)
+  .reduce((acc, { bonus }) => { return acc + bonus; }, 0);
 
 const forcaAtaquePerto = async (args, jogador, canal) => {
   try {
-    const { forca, habilidade, itens, pm, ph } = await buscarFicha(jogador, canal);
+    const { forca, habilidade, vantagens, pm, ph } = await buscarFicha(jogador, canal);
 
     const ehAtaqueEspecial = args[1] === 'ae';
     if (ehAtaqueEspecial && pm === 0) {
@@ -110,10 +109,10 @@ const forcaAtaquePerto = async (args, jogador, canal) => {
       return 'Você não tem PH suficiente para esse ataque';
     }
 
-    const bonusFa = somarAtributosItens(itens, 'faf');
-    const bonusForca = somarAtributosItens(itens, 'f');
-    const bonusHabilidade = somarAtributosItens(itens, 'h');
-    const bonusAtaqueEspecial = ehAtaqueEspecial && somarAtributosItens(itens, 'aef');
+    const bonusFa = somarAtributosItens(vantagens, 'faf');
+    const bonusForca = somarAtributosItens(vantagens, 'f');
+    const bonusHabilidade = somarAtributosItens(vantagens, 'h');
+    const bonusAtaqueEspecial = ehAtaqueEspecial && somarAtributosItens(vantagens, 'aef');
 
     let pmsRestantes = '';
     if (ehAtaqueEspecial) {
@@ -141,7 +140,7 @@ const forcaAtaquePerto = async (args, jogador, canal) => {
 
 const forcaAtaqueLonge = async (args, jogador, canal) => {
   try {
-    const { poderDeFogo, habilidade, itens, pm, ph } = await buscarFicha(jogador, canal);
+    const { poderDeFogo, habilidade, vantagens, pm, ph } = await buscarFicha(jogador, canal);
 
     const ehAtaqueEspecial = args[1] === 'ae';
     if (ehAtaqueEspecial && pm === 0) {
@@ -154,10 +153,10 @@ const forcaAtaqueLonge = async (args, jogador, canal) => {
       return 'Você não tem PH suficiente para esse ataque';
     }
 
-    const bonusFa = somarAtributosItens(itens, 'fap');
-    const bonusPdF = somarAtributosItens(itens, 'p');
-    const bonusHabilidade = somarAtributosItens(itens, 'h');
-    const bonusAtaqueEspecial = ehAtaqueEspecial && somarAtributosItens(itens, 'aep');
+    const bonusFa = somarAtributosItens(vantagens, 'fap');
+    const bonusPdF = somarAtributosItens(vantagens, 'p');
+    const bonusHabilidade = somarAtributosItens(vantagens, 'h');
+    const bonusAtaqueEspecial = ehAtaqueEspecial && somarAtributosItens(vantagens, 'aep');
 
     let pmsRestantes = '';
     if (ehAtaqueEspecial) {
@@ -205,7 +204,7 @@ const forcaDefesa = async (args, jogador, canal) => {
   const [comando, ...rest] = args;
 
   try {
-    const { armadura, habilidade, itens, ph } = await buscarFicha(jogador, canal);
+    const { armadura, habilidade, vantagens, ph } = await buscarFicha(jogador, canal);
 
     const criticoAutomatico = comando.match(/\*/gi);
     const quantidadeCriticos = criticoAutomatico ? criticoAutomatico.length : 0;
@@ -213,9 +212,9 @@ const forcaDefesa = async (args, jogador, canal) => {
       return 'Você não tem PH suficiente para esse movimento';
     }
 
-    const bonusFd = somarAtributosItens(itens, 'fd');
-    const bonusArmadura = somarAtributosItens(itens, 'a');
-    const bonusHabilidade = somarAtributosItens(itens, 'h');
+    const bonusFd = somarAtributosItens(vantagens, 'fd');
+    const bonusArmadura = somarAtributosItens(vantagens, 'a');
+    const bonusHabilidade = somarAtributosItens(vantagens, 'h');
 
     const { sh: semHabilidade, sa: semArmadura, ae: armaduraExtra } = checkVariocoesDefesa(rest);
     const multiplicadorHabilidade = semHabilidade ? 0 : 1;
@@ -244,7 +243,7 @@ const ataqueMagico = async (args, jogador, canal) => {
   if (args.length === 2) {
     try {
       const pmsGastos = Number(args[1]) || 0;
-      const { pm, itens, habilidade, ph } = await buscarFicha(jogador, canal);
+      const { pm, vantagens, habilidade, ph } = await buscarFicha(jogador, canal);
 
       if (pmsGastos === 0 || pmsGastos > pm) {
         return `Seus PMs atuais (${pm}) são insuficientes pra conjurar essa magia`;
@@ -256,7 +255,7 @@ const ataqueMagico = async (args, jogador, canal) => {
         return 'Você não tem PH suficiente para esse ataque';
       }
 
-      const bonusHabilidade = somarAtributosItens(itens, 'h');
+      const bonusHabilidade = somarAtributosItens(vantagens, 'h');
       const habilidadeTotal = habilidade + bonusHabilidade;
       const limiteMagico = habilidadeTotal === 0 ? 3 : habilidadeTotal * 5;
 
@@ -286,10 +285,10 @@ const ataqueMagico = async (args, jogador, canal) => {
 
 const iniciativa = async (jogador, canal) => {
   try {
-    const { habilidade, itens } = await buscarFicha(jogador, canal);
+    const { habilidade, vantagens } = await buscarFicha(jogador, canal);
 
-    const bonusIniciativa = somarAtributosItens(itens, 'ini');
-    const bonusHabilidade = somarAtributosItens(itens, 'h');
+    const bonusIniciativa = somarAtributosItens(vantagens, 'ini');
+    const bonusHabilidade = somarAtributosItens(vantagens, 'h');
 
     const { primeiraRolagem, segundaRolagem } = rolar2d6();
     const habilidadeTotal = habilidade + bonusHabilidade;
@@ -388,7 +387,7 @@ const incAtributo = async (args, jogador, canal) => {
         await removerFicha(jogador, canal);
         return 'GAME OVER';
       }
-      
+
       return `${descricao} modificado: ***${value[nome]} => ${novoValor}***`;
     }
   } catch (e) {
@@ -398,8 +397,7 @@ const incAtributo = async (args, jogador, canal) => {
 
 const stats = async (jogador, canal) => {
   try {
-    const { forca, habilidade, resistencia, armadura, poderDeFogo, pv, pvmax, pm, pmmax, po, ph, itens } = await buscarFicha(jogador, canal);
-    const listagemItens = itens.map(({ nome, atributoBonus, atributoValor }) => `\n\t\t- ${nome} (${atributoBonus}): ${atributoValor}`);
+    const { forca, habilidade, resistencia, armadura, poderDeFogo, pv, pvmax, pm, pmmax, po, ph } = await buscarFicha(jogador, canal);
 
     return `
     Força: ${forca}
@@ -411,41 +409,95 @@ const stats = async (jogador, canal) => {
     PM: ${pm} / ${pmmax}
     PO: ${po}
     PH: ${ph}
-    Itens: ${listagemItens.toString()}
     `;
   } catch (e) {
     return 'Você não tem personagem';
   }
 };
 
-const addItem = async (args, jogador, canal) => {
-  if (args.length === 4) {
-    const [, nomeItem, atributoBonus, atributoValor] = args;
-    try {
-      const item = {
-        nome: nomeItem,
-        atributoBonus,
-        atributoValor: Number(atributoValor)
-      };
-      await inserirItem(jogador, canal, item);
-      return `${nomeItem} adicionado`;
-    } catch (e) {
-      return 'Você não tem personagem';
-    }
+const dicionarioLista = {
+  i: { nome: 'itens', descricao: 'Itens' },
+  v: { nome: 'vantagens', descricao: 'Vantagens' }
+};
+
+const add = async (args, jogador, canal) => {
+  const lista = dicionarioLista[args[1]];
+  if (!lista) {
+    return 'Lista Inválida';
   }
-  return;
+  const { nome, descricao } = lista;
+
+  try {
+    if (nome === 'itens') {
+      const [, , ...rest] = args;
+      const nomeItem = rest.toString().replace(/,/g, ' ');
+      await inserirItem(jogador, canal, nome, nomeItem);
+      return `${nomeItem} adicionado (${descricao})`;
+    }
+
+    const [, , atributo, bonus, custo, ...rest] = args;
+    const nomeItem = rest.toString().replace(/,/g, ' ');
+    const item = {
+      nome: nomeItem,
+      atributo,
+      bonus: Number(bonus),
+      custo
+    };
+    await inserirItem(jogador, canal, nome, item);
+    return `${nomeItem} adicionado em ${descricao}`;
+  } catch (e) {
+    return 'Você não tem personagem';
+  }
 };
 
 const removeItem = async (args, jogador, canal) => {
-  if (args.length === 2) {
-    try {
-      await deletarItem(jogador, canal, args[1]);
-      return `${args[1]} removido`;
-    } catch (e) {
-      return 'Você não tem personagem';
-    }
+  const lista = dicionarioLista[args[1]];
+  if (!lista) {
+    return 'Lista Inválida';
   }
-  return;
+  const { nome, descricao } = lista;
+
+  try {
+    const ficha = await buscarFicha(jogador, canal);
+    const listaAtual = ficha[nome];
+    const indexElemento = args[2] - 1;
+    const elemento = nome === 'itens' ? listaAtual[indexElemento] : listaAtual[indexElemento].nome;
+
+    listaAtual.splice(indexElemento, 1);
+    await atualizarAtributo(jogador, canal, nome, listaAtual);
+
+    return `${elemento} removido de ${descricao}`;
+  } catch (e) {
+    return 'Erro ao remover elemento da lista';
+  }
+};
+
+const ls = async (args, jogador, canal) => {
+  const lista = dicionarioLista[args[1]];
+  if (!lista) {
+    return 'Lista Inválida';
+  }
+
+  try {
+    const ficha = await buscarFicha(jogador, canal);
+    const { nome, descricao } = lista;
+    let print;
+    if (nome === 'itens') {
+      print = ficha[nome].map((item, index) => `\n${index + 1} - ${item}`);
+    } else {
+      print = ficha[nome].map(({ nome: nomeItem, bonus, atributo, custo }, index) => {
+        const sinal = bonus > 0 ? '+' : '';
+        return `\n${index + 1} - ${nomeItem} (${custo} PM) => ${atributo} ${sinal}${bonus}`;
+      });
+    }
+    if (print.length > 0) {
+      return `Listando ${descricao}:${print.toString()}`;
+    } else {
+      return 'Lista vazia';
+    }
+  } catch (e) {
+    return 'Erro ao listar elementos';
+  }
 };
 
 const setAtributo = async (args, jogador, canal) => {
